@@ -39,4 +39,11 @@ describe('Owner catalog matches the approved server bounds', () => {
     render(<LocaleProvider><ServiceModal service={null} busy={false} disabled onSave={vi.fn()} onClose={() => {}} /></LocaleProvider>)
     expect(screen.getByRole('button', { name: en.saveService })).toBeDisabled()
   })
+  it('requires the Gujarati name before sending a valid zero-price service', async () => {
+    const f = await form('0', '1')
+    await f.user.clear(screen.getByLabelText(en.gujaratiName))
+    await f.submit()
+    expect(f.save).not.toHaveBeenCalled()
+    expect(screen.getByText(en.invalidServiceName)).toBeVisible()
+  })
 })

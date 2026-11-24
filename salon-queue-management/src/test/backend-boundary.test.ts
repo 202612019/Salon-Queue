@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { createHandler, type GatewayClient } from '../../supabase/functions/salonq-api/handler'
 
 function fixture() {
-  const rpc = vi.fn(async (name: string) => name === 'salonq_rate_limit' ? { data: true, error: null } : { data: { token: 'S-1' }, error: null })
+  const rpc = vi.fn(async (name: string) => name === 'salonq_rate_limit' || name === 'salonq_staff_session_active' ? { data: true, error: null } : { data: { token: 'S-1' }, error: null })
   const getUser = vi.fn(async () => ({ data: { user: { id: 'trusted-auth-user' } }, error: null }))
   const handler = createHandler({ rpc, auth: { getUser } } as GatewayClient, { allowedOrigins: ['http://localhost:5173'], backendKey: 'unit-test-key-only' })
   return { rpc, getUser, handler }
@@ -14,6 +14,8 @@ function request(action = 'public_snapshot', payload: Record<string, unknown> = 
     body: JSON.stringify({ action, payload }),
   })
 }
+const sessionId = '30000000-0000-4000-8000-000000000002'
+const verifiedTestToken = 'unit.' + btoa(JSON.stringify({ session_id: sessionId })) + '.signature'
 
 describe('trusted Edge boundary', () => {
   it('returns no-store/no-referrer and an explicit allowed origin', async () => {
@@ -37,8 +39,9 @@ describe('trusted Edge boundary', () => {
   })
   it('uses only the Supabase-verified identity for walk-ins', async () => {
     const { handler, rpc, getUser } = fixture()
-    await handler(request('admit', { source: 'walk_in', actor: 'forged' }, { authorization: 'Bearer test-session' }))
-    expect(getUser).toHaveBeenCalledWith('test-session')
+    await handler(request('admit', { source: 'walk_in', actor: 'forged' }, { authorization: 'Bearer ' + verifiedTestToken }))
+    expect(getUser).toHaveBeenCalledWith(verifiedTestToken)
+    expect(rpc).toHaveBeenCalledWith('salonq_staff_session_active', { actor: 'trusted-auth-user', session_id: sessionId })
     expect(rpc).toHaveBeenCalledWith('salonq_gateway', expect.objectContaining({ actor: 'trusted-auth-user' }))
   })
   it('denies revoked or invalid staff sessions before gateway writes', async () => {
@@ -46,6 +49,15 @@ describe('trusted Edge boundary', () => {
     getUser.mockResolvedValueOnce({ data: { user: null }, error: new Error('Expired') } as never)
     expect((await handler(request('admit', { source: 'walk_in' }, { authorization: 'Bearer invalid' }))).status).toBe(401)
     expect(rpc).not.toHaveBeenCalled()
+  })
+  it('denies a still-signed Auth JWT after its session row was removed', async () => {
+    const { handler, rpc } = fixture()
+    rpc.mockResolvedValueOnce({ data: false, error: null } as never)
+    const response = await handler(request('admit', { source: 'walk_in' }, { authorization: 'Bearer ' + verifiedTestToken }))
+    expect(response.status).toBe(401)
+    expect(await response.json()).toEqual({ error: 'AUTH_REQUIRED' })
+    expect(rpc).toHaveBeenCalledTimes(1)
+    expect(rpc).not.toHaveBeenCalledWith('salonq_gateway', expect.anything())
   })
   it('requires the private capability for status and never logs it', async () => {
     const { handler, rpc } = fixture()
@@ -63,6 +75,22 @@ describe('trusted Edge boundary', () => {
     const { handler, rpc } = fixture()
     rpc.mockResolvedValueOnce({ data: false, error: null } as never)
     expect((await handler(request())).status).toBe(429)
+    expect(rpc.mock.calls.some(([name]) => name === 'salonq_gateway')).toBe(false)
+  })
+  it.each(['admit', 'status'])('rate limits public %s with a generic response and no gateway call', async action => {
+    const { handler, rpc } = fixture()
+    rpc.mockResolvedValueOnce({ data: false, error: null } as never)
+    const response = await handler(request(action, { locator: 'b'.repeat(32), capability: 'a'.repeat(64) }))
+    expect(response.status).toBe(429)
+    expect(await response.json()).toEqual({ error: 'RATE_LIMITED' })
+    expect(rpc.mock.calls.some(([name]) => name === 'salonq_gateway')).toBe(false)
+  })
+  it('also bounds attempts against one private capability without returning its data', async () => {
+    const { handler, rpc } = fixture()
+    rpc.mockResolvedValueOnce({ data: true, error: null } as never).mockResolvedValueOnce({ data: false, error: null } as never)
+    const response = await handler(request('status', { locator: 'b'.repeat(32), capability: 'a'.repeat(64) }))
+    expect(response.status).toBe(429)
+    expect(await response.json()).toEqual({ error: 'RATE_LIMITED' })
     expect(rpc.mock.calls.some(([name]) => name === 'salonq_gateway')).toBe(false)
   })
   it('never forwards raw database exceptions or secret details', async () => {

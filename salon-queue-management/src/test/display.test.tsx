@@ -136,4 +136,44 @@ describe('Waiting Area TV Display (/display)', () => {
       expect(document.querySelector('.display-announcement')).not.toBeInTheDocument()
     } finally { vi.useRealTimers() }
   })
+  it('deduplicates Called chimes and establishes a silent baseline after reconnect', async () => {
+    const original = window.AudioContext
+    let starts = 0
+    class AudioMock {
+      currentTime = 0
+      destination = {}
+      createOscillator() { return { frequency: { setValueAtTime() {} }, connect() {}, start() { starts++ }, stop() {}, type: 'sine' } }
+      createGain() { return { gain: { setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} } }
+    }
+    Object.defineProperty(window, 'AudioContext', { configurable: true, value: AudioMock })
+    try {
+      const user = userEvent.setup(); open('/display'); await screen.findByText(salonFixture.salon_name)
+      await user.click(screen.getByRole('button', { name: en.enableSound })); starts = 0
+      const called = structuredClone(salonFixture); called.barbers[0].token = 'S-042'; called.barbers[0].status = 'called'
+      mock.public.mockResolvedValue(called)
+      const { act } = await import('@testing-library/react')
+      const refresh = async () => { await act(async () => { await Promise.all([...mock.refresh].map(load => load())) }) }
+      await refresh(); expect(starts).toBe(2)
+      mock.public.mockResolvedValue(structuredClone(called)); await refresh(); expect(starts).toBe(2)
+      mock.public.mockRejectedValue(new Error('BACKEND_UNAVAILABLE')); await refresh()
+      expect(screen.getByText(en.staleData)).toBeVisible()
+      mock.public.mockResolvedValue(structuredClone(called)); await refresh()
+      expect(starts).toBe(2)
+      expect(screen.getByText('S-042')).toBeVisible()
+    } finally { Object.defineProperty(window, 'AudioContext', { configurable: true, value: original }) }
+  })
+  it('keeps the Called visual available when audio permission is denied', async () => {
+    const original = window.AudioContext
+    Object.defineProperty(window, 'AudioContext', { configurable: true, value: class { constructor() { throw new Error('Permission denied') } } })
+    try {
+      const user = userEvent.setup(); open('/display'); await screen.findByText(salonFixture.salon_name)
+      await user.click(screen.getByRole('button', { name: en.enableSound }))
+      const called = structuredClone(salonFixture); called.barbers[0].token = 'S-043'; called.barbers[0].status = 'called'
+      mock.public.mockResolvedValue(called)
+      const { act } = await import('@testing-library/react')
+      await act(async () => { await Promise.all([...mock.refresh].map(load => load())) })
+      expect(screen.getByText('S-043')).toBeVisible()
+      expect(document.querySelector('.display-announcement')).toBeInTheDocument()
+    } finally { Object.defineProperty(window, 'AudioContext', { configurable: true, value: original }) }
+  })
 })

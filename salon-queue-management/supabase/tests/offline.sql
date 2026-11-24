@@ -147,3 +147,19 @@ select set_config('request.jwt.claim.sub','30000000-0000-4000-8000-000000000003'
 reset role;
 select public.test_fails(format('select public.salonq_staff_command(''start'',%L::jsonb)',jsonb_build_object('request_key',repeat('e',64),'entry_id',result->>'entry_id','version',2)),'FORBIDDEN') from public.test_results where name='ravi';
 update salon_private.staff_profiles set barber_id='20000000-0000-4000-8000-000000000001' where user_id='30000000-0000-4000-8000-000000000003';
+-- T51/T52: JWT signature/expiry alone must not restore a revoked Auth session.
+delete from auth.sessions where user_id='30000000-0000-4000-8000-000000000003';
+select public.test_fails('select public.salonq_staff_profile()','AUTH_REQUIRED');
+select public.test_fails('select public.salonq_staff_command(''snapshot'')','AUTH_REQUIRED');
+select public.test_fails('select public.salonq_staff_command(''start'',jsonb_build_object(''request_key'',repeat(''e'',64)))','AUTH_REQUIRED');
+insert into auth.sessions(id,user_id) values ('30000000-0000-4000-8000-000000000003','30000000-0000-4000-8000-000000000003');
+select public.test_assert(public.salonq_staff_profile()->>'role'='barber','T51 restored valid session rechecks protected profile');
+select set_config('request.jwt.claim.session_id','30000000-0000-4000-8000-000000000004',false);
+select public.test_fails('select public.salonq_staff_command(''snapshot'')','AUTH_REQUIRED');
+select set_config('request.jwt.claim.session_id','',false);
+update auth.sessions set not_after=clock_timestamp()-interval '1 second' where user_id='30000000-0000-4000-8000-000000000003';
+select public.test_fails('select public.salonq_staff_command(''snapshot'')','AUTH_REQUIRED');
+update auth.sessions set not_after=null;
+set role authenticated;
+select public.test_fails('select public.salonq_staff_session_active(''30000000-0000-4000-8000-000000000003'',''30000000-0000-4000-8000-000000000003'')','42501');
+reset role;

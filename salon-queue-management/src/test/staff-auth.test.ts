@@ -5,6 +5,21 @@ const auth = vi.hoisted(() => ({ rpc: vi.fn(), getUser: vi.fn(), signIn: vi.fn()
 vi.mock('../lib/supabase', () => ({ getSupabaseClient: () => ({ rpc: auth.rpc, auth: { getUser: auth.getUser, signInWithPassword: auth.signIn, signOut: auth.signOut, onAuthStateChange: (callback: typeof auth.callback) => { auth.callback = callback; return { data: { subscription: { unsubscribe: auth.unsubscribe } } } } } }) }))
 beforeEach(() => { vi.clearAllMocks(); auth.getUser.mockResolvedValue({ error: null }); auth.signIn.mockResolvedValue({ error: null }); auth.signOut.mockResolvedValue({ error: null }) })
 describe('real staff auth adapter with controlled SDK boundary', () => {
+  it('revalidates a refreshed session without replaying any staff mutation', async () => {
+    vi.useFakeTimers()
+    auth.rpc.mockResolvedValue({ data: { user_id: 'fictional', role: 'owner', barber_id: null }, error: null })
+    const updates = vi.fn(), stop = observeStaff(updates)
+    const session = { user: { id: 'fictional' }, access_token: 'unit-only' } as Session
+    auth.callback('SIGNED_IN', session)
+    await vi.advanceTimersByTimeAsync(1)
+    expect(updates).toHaveBeenLastCalledWith(expect.objectContaining({ session, profile: expect.objectContaining({ role: 'owner' }), checking: false }))
+    auth.callback('TOKEN_REFRESHED', session)
+    expect(updates).toHaveBeenLastCalledWith(expect.objectContaining({ session: null, profile: null, checking: true }))
+    await vi.advanceTimersByTimeAsync(1)
+    expect(updates).toHaveBeenLastCalledWith(expect.objectContaining({ session, profile: expect.objectContaining({ role: 'owner' }), checking: false }))
+    expect(auth.rpc.mock.calls.every(([name]) => name === 'salonq_staff_profile')).toBe(true)
+    stop(); vi.useRealTimers()
+  })
   it('obtains barber route linkage from protected data, not editable metadata or a URL', async () => {
     auth.rpc.mockResolvedValueOnce({ data: { user_id: 'fictional', role: 'barber', barber_id: 'barber-1' }, error: null }).mockResolvedValueOnce({ data: { barber: { id: 'barber-1', slug: 'ravi' } }, error: null })
     expect(await loadStaffProfile()).toEqual({ user_id: 'fictional', role: 'barber', barber_id: 'barber-1', barber_slug: 'ravi' })

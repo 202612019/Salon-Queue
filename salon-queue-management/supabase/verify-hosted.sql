@@ -34,5 +34,12 @@ select
   (select relrowsecurity from pg_class where oid='public.salonq_changes'::regclass) as signal_rls,
   has_table_privilege('anon','public.salonq_changes','select')
     and not has_table_privilege('anon','public.salonq_changes','insert,update,delete') as signal_read_only,
-  (select count(*)=3 from salon_private.services where enabled) as three_enabled_demo_services,
-  (select count(*)=3 from salon_private.barbers where slug in ('ravi','amit','imran')) as three_demo_barbers;
+  (select coalesce(bool_and(price_paise between 0 and 10000000 and duration_minutes between 1 and 480
+    and char_length(btrim(name_en)) between 2 and 80 and char_length(btrim(name_gu)) between 2 and 80),true)
+    from salon_private.services) as catalog_bounds_valid,
+  (select count(*)=3 from salon_private.barbers where slug in ('ravi','amit','imran')) as three_demo_barbers,
+  pg_get_functiondef('salon_private.staff(uuid,text[])'::regprocedure) like '%session_active%'
+    as staff_checks_current_auth_session,
+  has_function_privilege('service_role','public.salonq_staff_session_active(uuid,uuid)','execute')
+    and not has_function_privilege('anon','public.salonq_staff_session_active(uuid,uuid)','execute')
+    and not has_function_privilege('authenticated','public.salonq_staff_session_active(uuid,uuid)','execute') as session_check_backend_only;

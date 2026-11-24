@@ -298,6 +298,60 @@ try {
       assert.equal(outcomes.filter(result => result.status === 'rejected' && result.reason.message === 'STALE_VERSION').length, 1)
       assert.ok(['in_chair', 'no_show'].includes((await current(receipt)).status))
     })
+    async function waitBlocked(client) {
+      const deadline=Date.now()+5000
+      while(Date.now()<deadline){
+        const result=await db.query('select cardinality(pg_blocking_pids($1))>0 as blocked',[client.processID])
+        if(result.rows[0].blocked)return
+        await new Promise(resolve=>setTimeout(resolve,10))
+      }
+      throw new Error('Expected independent transaction to wait for the salon lock')
+    }
+    for(const kind of ['hours','switch','catalog','duty']) {
+      for(const first of ['configuration','admission']) {
+        await check(`T85 ${kind} race with ${first} committed first remains consistent`, async()=>{
+          // This runner has already verified its disposable local cluster marker.
+          await db.query('truncate salon_private.operation_receipts, salon_private.queue_entries cascade')
+          await clock('2026-11-25T12:30:00+05:30')
+          await db.query("update salon_private.settings set opening_time='10:00',closing_time='21:00',online_enabled=true; update salon_private.barbers set on_duty=true,on_break=false; update salon_private.services set enabled=true")
+          const imran='20000000-0000-4000-8000-000000000003'
+          const req=await request('9876500099',{preferred_barber_id:imran})
+          const settings=(await db.query('select * from salon_private.settings')).rows[0]
+          const service=(await db.query('select * from salon_private.services where id=$1',[haircut])).rows[0]
+          const barber=(await db.query('select * from salon_private.barbers where id=$1',[imran])).rows[0]
+          const operation=kind==='catalog'?'save_service':kind==='duty'?'set_duty':'save_settings'
+          const payload=kind==='catalog'?{...service,price_paise:service.price_paise+100}:kind==='duty'?{barber_id:imran,version:barber.version,on_duty:false,on_break:false}:{...settings,opening_time:kind==='hours'?'13:00':settings.opening_time,online_enabled:kind!=='switch'}
+          const configure=()=>staff(operation,{...payload,request_key:key()},owner,b)
+          if(first==='configuration'){
+            await a.query('begin')
+            try{
+              await a.query("set local role authenticated; select set_config('request.jwt.claim.sub','30000000-0000-4000-8000-000000000001',true); select pg_advisory_xact_lock(7350141)")
+              const pending=gateway('admit',req,b).then(value=>({value}),error=>({error}))
+              await waitBlocked(b)
+              await a.query('select public.salonq_staff_command($1,$2::jsonb)',[operation,JSON.stringify({...payload,request_key:key()})])
+              await a.query('commit')
+              const result=await pending
+              assert.equal(result.error?.message,{hours:'SALON_CLOSED',switch:'ONLINE_CLOSED',catalog:'CATALOG_CHANGED',duty:'BARBER_UNAVAILABLE'}[kind])
+              assert.equal((await db.query('select count(*)::int n from salon_private.queue_entries')).rows[0].n,0)
+            }catch(error){await a.query('rollback');throw error}
+          }else{
+            await a.query('begin')
+            try{
+              const receipt=await gateway('admit',req,a)
+              const pending=configure().then(value=>({value}),error=>({error}))
+              await waitBlocked(b)
+              await a.query('commit')
+              const result=await pending
+              if(kind==='duty')assert.equal(result.error?.message,'BARBER_HAS_WAITING')
+              else assert.ok(result.value&&!result.error)
+              const entry=await gateway('status',{locator:receipt.locator,capability:req.capability})
+              assert.equal(entry.status,'waiting')
+              assert.equal((await db.query('select count(*)::int n from salon_private.queue_entries')).rows[0].n,1)
+            }catch(error){await a.query('rollback');throw error}
+          }
+        })
+      }
+    }
   } finally { await a.end(); await b.end() }
   console.log(`Database integration checks: ${passed} passed. Local PostgreSQL with test-only Auth identities; hosted Auth/Edge/Realtime delivery NOT verified.`)
 } finally { await db.end() }

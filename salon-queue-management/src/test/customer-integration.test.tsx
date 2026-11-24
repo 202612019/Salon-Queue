@@ -32,6 +32,7 @@ async function fill(user: ReturnType<typeof userEvent.setup>) {
 }
 beforeEach(() => {
   forgetCustomerAccess(); api.refresh.clear(); vi.clearAllMocks()
+  for (const mock of [api.public, api.status, api.admit, api.receipt, api.cancel]) mock.mockReset()
   api.public.mockResolvedValue(structuredClone(salonFixture)); api.status.mockResolvedValue(structuredClone(entryFixture))
   api.admit.mockResolvedValue({ locator, token: entryFixture.token }); api.receipt.mockResolvedValue({ locator, token: entryFixture.token })
   api.cancel.mockResolvedValue({ ...entryFixture, status: 'cancelled', version: 2, estimate: null })
@@ -39,6 +40,78 @@ beforeEach(() => {
 })
 
 describe('functional customer integration with a mocked trusted transport', () => {
+  it.each(['price', 'duration'])('requires explicit %s reconfirmation and a new bound request after a server catalog rejection', async field => {
+    api.admit.mockRejectedValueOnce(new BackendError('CATALOG_CHANGED')).mockResolvedValueOnce({ locator, token: entryFixture.token })
+    const user = userEvent.setup(); open(); await fill(user)
+    await user.click(screen.getByRole('button', { name: en.confirmJoin }))
+    await screen.findAllByText(en.catalogChanged)
+    const original = api.admit.mock.calls[0][0]
+    const revised = { ...salonFixture.services[0], version: 2, ...(field === 'price' ? { price_paise: 20000 } : { duration_minutes: 40 }) }
+    api.public.mockResolvedValue({ ...salonFixture, services: [revised, ...salonFixture.services.slice(1)] })
+    await act(async () => { await Promise.all([...api.refresh].map(refresh => refresh())) })
+    expect(screen.getByRole('button', { name: en.confirmJoin })).toBeDisabled()
+    expect(api.admit).toHaveBeenCalledTimes(1)
+    await user.click(screen.getByRole('button', { name: en.reviewSelection }))
+    await user.click(screen.getByRole('button', { name: en.confirmJoin }))
+    await screen.findByText(entryFixture.token)
+    const next = api.admit.mock.calls[1][0]
+    expect(next.request_key).not.toBe(original.request_key)
+    expect(next.capability).not.toBe(original.capability)
+    expect(next.services[0]).toEqual(expect.objectContaining({ version: 2, price_paise: revised.price_paise, duration_minutes: revised.duration_minutes }))
+  })
+  it('shows a manual online-pause reason and disables joining on Home and Join', async () => {
+    api.public.mockResolvedValue({ ...salonFixture, admission: { online: false, walk_in: true, reason: 'ONLINE_PAUSED' } })
+    const home = open('/')
+    await screen.findAllByText(en.onlinePausedReason)
+    expect(screen.getByRole('button', { name: en.join })).toBeDisabled()
+    home.unmount(); open('/join')
+    await screen.findByText(en.onlinePausedReason)
+    expect(screen.getByRole('button', { name: en.confirmJoin })).toBeDisabled()
+    expect(api.admit).not.toHaveBeenCalled()
+  })
+  it('does not unlock the authoritative online cutoff after a forward browser clock jump', async () => {
+    api.public.mockResolvedValue({ ...salonFixture, admission: { online: false, walk_in: true, reason: 'ONLINE_CUTOFF' } })
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 86400000)
+    const user = userEvent.setup(); open(); await fill(user)
+    expect(screen.getByRole('button', { name: en.confirmJoin })).toBeDisabled()
+    expect(screen.getByText(en.cutoffReason)).toBeVisible()
+    expect(api.admit).not.toHaveBeenCalled()
+  })
+  it('recovers a committed admission after an uncertain response followed by remount', async () => {
+    api.admit.mockRejectedValue(new BackendError('NETWORK_UNCERTAIN', true))
+    const user = userEvent.setup(), view = open()
+    await fill(user); await user.click(screen.getByRole('button', { name: en.confirmJoin }))
+    await screen.findByText(en.networkUncertain)
+    const original = api.admit.mock.calls[0][0]
+    view.unmount(); open('/join')
+    expect(screen.getByRole('button', { name: en.confirmJoin })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: en.checkPrevious }))
+    expect(await screen.findByText(entryFixture.token)).toBeVisible()
+    expect(api.receipt).toHaveBeenCalledWith(original.request_key, original.capability)
+    expect(api.admit).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(localStorage)).not.toMatch(/Fictional Person|9876500001/)
+  })
+  it('permits an otherwise valid join with every barber on break and explains the selected warning', async () => {
+    api.public.mockResolvedValue({ ...salonFixture, estimate: { ...salonFixture.estimate, state: 'unavailable', minutes: null }, barbers: salonFixture.barbers.map(barber => ({ ...barber, on_break: true, estimate: { ...salonFixture.estimate, state: 'unavailable', minutes: null } })) })
+    const user = userEvent.setup(); open(); await fill(user)
+    await user.click(screen.getByRole('radio', { name: /Ravi/ }))
+    expect(screen.getByText(en.relevantBreak)).toBeVisible()
+    expect(screen.getAllByText(en.estimateUnavailable).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: en.confirmJoin })).toBeEnabled()
+  })
+  it('announces becoming second and subsequently Called with the assigned barber', async () => {
+    api.status.mockResolvedValue({ ...entryFixture, estimate: { ...entryFixture.estimate, position: 3 } })
+    saveCustomerAccess({ locator, token: entryFixture.token }, capability); open('/status/' + locator)
+    await screen.findByText(entryFixture.token)
+    expect(screen.queryByText(en.arrivalReminder)).not.toBeInTheDocument()
+    api.status.mockResolvedValue({ ...entryFixture, estimate: { ...entryFixture.estimate, position: 2 } })
+    await act(async () => { await Promise.all([...api.refresh].map(refresh => refresh())) })
+    expect(screen.getByText(en.arrivalReminder)).toBeVisible()
+    api.status.mockResolvedValue({ ...entryFixture, status: 'called', version: 2, assigned_barber: { id: salonFixture.barbers[0].id, name: 'Ravi' } })
+    await act(async () => { await Promise.all([...api.refresh].map(refresh => refresh())) })
+    expect(document.querySelector('.called-notification')).toHaveAttribute('role', 'alert')
+    expect(screen.getByText(en.calledWith.replace('{barber}', 'Ravi'))).toBeVisible()
+  })
   it('renders authoritative public information without treating the example pass as live', async () => {
     open('/')
     expect(await screen.findByText(salonFixture.services[0].name_en)).toBeVisible()

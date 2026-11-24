@@ -9,13 +9,15 @@ const database = 'salonq_offline_' + Date.now()
 const created = spawnSync(executable, ['--single', '-j', '-D', data, 'postgres'], { input: 'create database ' + database + ';\n\n', encoding: 'utf8', timeout: 30000 })
 if (created.error || created.status !== 0 || /\b(ERROR|FATAL|PANIC):/.test((created.stdout ?? '') + (created.stderr ?? ''))) throw new Error('Cannot create isolated offline test database.')
 const migrations = (await readdir('supabase/migrations')).filter(file => file.endsWith('.sql')).sort().map(file => 'supabase/migrations/' + file)
-const files = ['supabase/tests/bootstrap.sql', ...migrations, 'supabase/seed.sql', 'supabase/tests/offline.sql']
+const acceptance = process.argv.includes('--acceptance')
+const files = ['supabase/tests/bootstrap.sql', ...migrations, 'supabase/seed.sql', 'supabase/tests/offline.sql', ...(acceptance ? ['supabase/tests/acceptance.sql'] : [])]
 const sql = (await Promise.all(files.map(file => readFile(file, 'utf8')))).join('\n').replace(/\n[ \t]*\n/g, '\n') + '\n\n'
 const result = spawnSync(executable, ['--single', '-j', '-D', data, database], { input: sql, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024, timeout: 60000 })
 const output = (result.stdout ?? '') + '\n' + (result.stderr ?? '')
 await mkdir('.artifacts', { recursive: true })
 await writeFile('.artifacts/sql-offline-results.log', output)
 const notices = [...output.matchAll(/(?:NOTICE|WARNING):\s+(PASS [^\r\n]+)/g)].map(match => match[1])
+if (acceptance) await writeFile('.artifacts/acceptance-sql-results.json', JSON.stringify({ checkedAt: new Date().toISOString(), environment: 'Disposable local PostgreSQL single-user database', labels: notices.filter(label => /^PASS T\d/.test(label)) }, null, 2))
 for (const line of notices) console.log(line)
 if (result.error || result.status !== 0 || notices.length < 40 || /\b(ERROR|FATAL|PANIC):/.test(output)) {
   console.error('Offline PostgreSQL checks failed. Diagnostics: ignored .artifacts/sql-offline-results.log (fictional data only).')

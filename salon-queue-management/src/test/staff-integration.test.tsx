@@ -101,6 +101,40 @@ describe('staff routes and credential form', () => {
   })
 })
 describe('Reception operational components', () => {
+  it('explains closing and disables Add Walk-in when the authoritative salon clock is closed', async () => {
+    mock.public.mockResolvedValue({ ...salonFixture, admission: { online: false, walk_in: false, reason: 'SALON_CLOSED' } })
+    signIn(); open()
+    await screen.findByText(en.salonClosedReason, { exact: false })
+    expect(screen.getByRole('button', { name: en.addWalkIn })).toBeDisabled()
+    expect(screen.queryByRole('dialog', { name: en.walkInTitle })).not.toBeInTheDocument()
+  })
+  it('still opens the walk-in form during an online cutoff when walk-ins are permitted', async () => {
+    mock.public.mockResolvedValue({ ...salonFixture, admission: { online: false, walk_in: true, reason: 'ONLINE_CUTOFF' } })
+    signIn(); const user = userEvent.setup(); open()
+    await waitFor(() => expect(screen.getByRole('button', { name: en.addWalkIn })).toBeEnabled())
+    await user.click(screen.getByRole('button', { name: en.addWalkIn }))
+    expect(screen.getByRole('dialog', { name: en.walkInTitle })).toBeVisible()
+    expect(screen.getByText(en.cutoffReason, { exact: false })).toBeVisible()
+  })
+  it('reconciles server rejection when a forward browser clock jump unlocks the No-show display', async () => {
+    signIn()
+    reception.entries[0] = { ...reception.entries[0], status: 'called', called_at: '2026-11-24T09:50:01+05:30', assigned_barber: { id: reception.barbers[0].id, name: 'Ravi' } }
+    mock.command.mockImplementation(async (action: string) => {
+      if (action === 'snapshot') return structuredClone(reception)
+      throw new BackendError('NO_SHOW_TOO_EARLY')
+    })
+    const user = userEvent.setup(); open()
+    const label = en.noShow + ' · ' + entryFixture.token
+    expect(await screen.findByRole('button', { name: label })).toBeDisabled()
+    const advanced = Date.now() + 3600000
+    vi.spyOn(Date, 'now').mockReturnValue(advanced)
+    await waitFor(() => expect(screen.getByRole('button', { name: label })).toBeEnabled(), { timeout: 3000 })
+    await user.click(screen.getByRole('button', { name: label }))
+    await user.click(screen.getByRole('button', { name: en.confirmAction }))
+    expect(await screen.findByText(en.noShowTooEarly)).toBeVisible()
+    await waitFor(() => expect(screen.getByRole('button', { name: label })).toBeDisabled())
+    expect(reception.entries[0].status).toBe('called')
+  })
   it('loads authorized customer rows, counts and barber cards without fictional operational tokens', async () => {
     signIn(); open(); expect(await screen.findByText(entryFixture.token)).toBeVisible(); expect(screen.getByText(entryFixture.customer_name)).toBeVisible()
     expect(screen.queryByText('S-013')).not.toBeInTheDocument(); expect(screen.queryByText(en.staffPreviewHint)).not.toBeInTheDocument()

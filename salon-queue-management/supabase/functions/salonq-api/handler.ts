@@ -56,6 +56,13 @@ export function createHandler(client: GatewayClient, config: HandlerConfig) {
         const identity = await client.auth.getUser(token)
         if (identity.error || !identity.data.user) return respond(401, { error: 'AUTH_REQUIRED' })
         actor = identity.data.user.id
+        let sessionId: unknown
+        try { sessionId = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).session_id }
+        catch { return respond(401, { error: 'AUTH_REQUIRED' }) }
+        if (typeof sessionId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)) return respond(401, { error: 'AUTH_REQUIRED' })
+        const session = await client.rpc('salonq_staff_session_active', { actor, session_id: sessionId })
+        if (session.error) return respond(503, { error: 'BACKEND_UNAVAILABLE' })
+        if (session.data !== true) return respond(401, { error: 'AUTH_REQUIRED' })
       }
       // The deployed gateway supplies client IP headers. Never accept a rate bucket from the body.
       const ip = request.headers.get('x-real-ip') ?? request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
