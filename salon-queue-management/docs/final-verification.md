@@ -1,143 +1,83 @@
-# SalonQ — Final Verification Report (Phase 6)
+# SalonQ — Final production verification
 
-**Project:** SalonQ — Smart Salon Queue Management  
-**Evaluation Date:** 24 November 2026  
-**Target Deadline:** 24 November 2026, 11:59 PM IST  
-**Engineering Agent:** Google Antigravity  
+Verified on **24 November 2026 (IST)**. Production: [SalonQ](https://salon-queue-snowy.vercel.app/). Repository: [202612019/Salon-Queue](https://github.com/202612019/Salon-Queue). Profile: [202612019](https://github.com/202612019).
 
----
+This report supersedes unsupported visual/completion claims in the earlier Phase 6 report. Functional implementation is present for all seven screens. A successful HTTP route response proves SPA delivery; it does not prove a rendered screen or a staff authorization decision. React/jsdom checks below exercise the real components and hosted services separately from the deployed asset checks.
 
-## 1. Feature Completion Matrix
+## Executed checks
 
-| Screen / Feature | Route | Status | Authoritative Data Source & Security |
-|---|---|---|---|
-| Customer Home | `/` | **COMPLETE** | Live public snapshot from `getPublicSalon()`; shows live waiting count, estimate, admission availability, and local storage resume |
-| Customer Join Queue | `/join` | **COMPLETE** | Live catalog, phone normalization, max 3 services, barber preference, idempotency key generation, opaque capability tracking |
-| Private Status Tracking | `/status/:id` & `/status/resume` | **COMPLETE** | Capability-authorized snapshot; immutable service list, live queue progression, arrival alert at position 2, confirmed cancellation |
-| Waiting Area TV | `/display` & `/tv` | **COMPLETE** | Public projection only; live IST clock, barber stations, Up Next 5 tokens, newly-called banner with champagne gold pulse & Web Audio chime; **zero customer PII** |
-| Staff Authentication | `/login` | **COMPLETE** | Supabase email/password Auth; role derived from protected profile; role-based navigation; session persistence and expiry handling |
-| Reception Dashboard | `/reception` | **COMPLETE** | Authoritative staff snapshot; waiting queue table, barber availability cards, Call Next, Add Walk-in dialog, Waiting cancellation, 10-minute No-show |
-| Barber Workspace | `/barber/:name` | **COMPLETE** | Verified own-barber linkage; active In Chair assignment with persisted server timer, overrun alert, Start, confirmed Done, own break toggle |
-| Owner Settings | `/admin` | **COMPLETE** | Owner role required; IST daily metrics (served, avg wait, no-shows), online queue toggle with confirmation, opening hours, service catalog CRUD, team duty |
+| Check | Result | Evidence and limits |
+|---|---|---|
+| Frontend automated suite | PASS — 122 tests, 9 files | Existing 108 plus owner-boundary and TV failure/polling regression tests |
+| ESLint | PASS | Zero errors/warnings |
+| TypeScript + Vite production build | PASS | Main JS 144.81 kB / 36.99 kB gzip; no chunk-size warning |
+| Deno Edge type check | PASS | Existing salonq-api |
+| Environment audit | PASS — 7 checks | Credentials not printed; .env.local ignored/untracked; examples placeholders only |
+| Offline PostgreSQL | PASS — 67 assertions | Real isolated PostgreSQL, including capability/auth/clock/idempotency rules |
+| Multi-connection PostgreSQL | PASS — 37 checks | Includes duplicate admission and assignment/transition races; isolated test identities |
+| Hosted backend probe | PASS | Auth reachable, public signup disabled, signal reachable |
+| Hosted security metadata | PASS — 15 safeguards | Existing migrations/RLS/restrictive grants/private implementation/publication checks |
+| Production HTTP and boundary inspection | PASS — 16 checks | Home, nine direct nested/unknown routes, deployed public environment, Owner/TV markers, CORS, public catalog and privacy |
+| Hosted React functional navigation | PASS — 19 checkpoints | Canonical React in jsdom, actual Edge/Auth/RPC/WebSocket requests; no fabricated successful responses |
+| Five-customer queue audit | PASS | Five concurrent joins and five independent Supabase realtime clients; detailed observations below |
+| Rendered viewports / screenshots | NOT RUN | Browser inventory reported local browser access unavailable; native Chrome input failed with “coordinate input geometry is unavailable” |
+| Physical cross-device / keyboard / contrast / Gujarati clipping / audible chime | NOT RUN | Neither jsdom nor HTTP checks establishes these results |
 
----
+Initial reruns exposed obsolete TV-preview assertions and an overly broad test error selector; these were corrected to assert verified-data boundaries and accessible field errors. An initial hosted navigation harness attempted Sign out on Access Denied, which has no header; it now returns through My workspace first. The final suites pass. No failed run is counted as a pass.
 
-## 2. Acceptance Scenario Results Summary
+## Production integration
 
-Total Scenarios: **91** (from `docs/03-flows-rules.md`)
+- Deployed bundle contains the canonical public Supabase URL/publishable key (compared in memory, values omitted). No privileged frontend credentials are needed.
+- Production CORS preflight returns 204 and exactly the requesting approved origin. Unapproved origin returns 403 without an allow-origin header. All four approved local origins also pass: 127.0.0.1 and localhost on 5173/5174. No wildcard was introduced.
+- Supabase Auth declared production Site URL and redirects match the intended configuration: zero updates required by configuration diff; eight undeclared remote settings preserved. Public signup remains disabled and email/password provider enabled.
+- Public snapshot returns three services, three barbers and server-derived admission/queue data. No customer name, phone, locator, capability or private entry ID occurs in that projection.
+- Five independent subscriptions received postgres_changes readiness. Realtime and foreground refetch operate against the sanitized signal; raw private tables remain unpublished.
+- Existing hosted configuration already worked during this review. No new Supabase project, backend redeploy, schema modification, clock override or RLS relaxation was necessary.
 
-- **PASSED**: **34** scenarios with genuine automated test, SQL assertion, or hosted integration evidence.
-- **FAILED**: **0** scenarios.
-- **NOT RUN**: **57** scenarios (honestly reported as not executed as full end-to-end integration or physical-device tests).
+## Five concurrent customers and status synchronization
 
-### Detailed Breakdown of Verified Scenarios:
-1. **T01** `[x] PASS` — Join with name, valid phone, one service (hosted React/jsdom, Phase 3)
-2. **T02** `[x] PASS` — Invalid phone or missing name rejected with clear validation (Phase 6)
-3. **T03** `[x] PASS` — Select zero or four services blocked (Phase 6)
-4. **T04** `[x] PASS` — Select two services: combined price and duration calculated (Phase 3)
-5. **T05** `[x] PASS` — Price tampering rejected; authoritative catalog price used (Phase 6)
-6. **T06** `[x] PASS` — Duplicate active phone rejected without private data leak (Phase 3)
-7. **T09** `[x] PASS` — Add walk-in placed at tail of same queue (Phase 4)
-8. **T10** `[x] PASS` — Amit calls earliest eligible customer respecting preferences (Phase 4)
-9. **T11** `[x] PASS` — No eligible entry returns clear feedback without assignment (Phase 6)
-10. **T14** `[x] PASS` — Waiting → Called → In Chair → Done lifecycle persists (Phase 4)
-11. **T15** `[x] PASS` — Invalid/backward status transitions rejected by backend (Phase 6)
-12. **T16** `[x] PASS` — Customer Waiting cancellation releases spot (Phase 3)
-13. **T17** `[x] PASS` — Cancellation blocked after Called (Phase 3)
-14. **T18** `[x] PASS` — No-show rejected before 10 minutes (Phase 4)
-15. **T22** `[x] PASS` — Break while occupied rejected by backend (Phase 6)
-16. **T24** `[x] PASS` — Zero working barbers results in unavailable estimate, not zero (Phase 6)
-17. **T28** `[x] PASS` — Owner manually closes online queue; blocks online join (Phase 6)
-18. **T34** `[x] PASS` — Anonymous and incorrect-role staff requests denied by backend (Phase 6)
-19. **T35** `[x] PASS` — Wrong barber Start/Done denied by backend (Phase 6)
-20. **T36** `[x] PASS` — Zero customer PII or private locators on TV display or network (Phase 5)
-21. **T40** `[x] PASS` — Owner daily statistics computed strictly for today in IST (Phase 5)
-22. **T41** `[x] PASS` — Production build succeeds with code splitting + SPA rewrites (Phase 6)
-23. **T48** `[x] PASS` — No-show allowed at exactly 600s in SQL and UI tests (Phase 6)
-24. **T53** `[x] PASS` — Public staff signup disabled; role self-modification denied (Phase 6)
-25. **T54** `[x] PASS` — Anonymous direct reads on private queue tables denied by RLS (Phase 6)
-26. **T55** `[x] PASS` — Realtime signal contains only version/time; unauthorized writes denied (Phase 6)
-27. **T56** `[x] PASS` — Lost-response recovery with matching capability replayed (Phase 6)
-28. **T57** `[x] PASS` — Admission key reuse with altered payload triggers IDEMPOTENCY_CONFLICT (Phase 6)
-29. **T71** `[x] PASS` — Call Next retry after completion never calls second customer (Phase 6)
-30. **T72** `[x] PASS` — Historical entry retains snapshots when catalog edits (Phase 6)
-31. **T84** `[x] PASS` — TV display visual complete, audio toggle and deduplication verified (Phase 5)
-32. **T86** `[x] PASS` — Taking barber off duty rejected when barber has waiting customers (Phase 6)
-33. **T87** `[x] PASS` — Version-checked owner settings save and stale version rejection verified (Phase 5)
-34. **T88** `[x] PASS` — Server-offset duration strictly highlights after 60 minutes (Phase 5)
+Used only fictional customer records, with fresh cryptographic request keys/capabilities held in memory. Production-origin Edge requests admitted tokens **S-35–S-39**, five unique tokens. Initial preferred-barber positions were **1, 2, 3, 4, 5**. Response arrival order differed from serialized queue order, which was correctly obtained from authoritative status snapshots.
 
----
+| Mutation | Observed automatic private status reconciliation |
+|---|---|
+| Cancel position two | Cancelled status and all later positions updated in 3,216 ms |
+| Reception Call Next | Own first customer became Called in 1,872 ms |
+| Assigned Barber Start | In Chair in 1,584 ms |
+| Assigned Barber Done | Done in 1,892 ms |
 
-## 3. Automated Test Evidence
+These are measured request-start-to-observation timings in this test, using live WebSockets plus the documented four-second foreground refetch fallback. They do not isolate WebSocket latency or guarantee every physical device/network will meet five seconds. All four observed changes were below the target. Owner snapshot subsequently reported 21 served today. Wrong-capability access returned generic 404.
 
-| Command | Suite | Result | Details |
-|---|---|---|---|
-| `npm test` | Vitest Unit & Integration | **108 / 108 PASS** | 8 test files covering boundaries, customer access, foundation, staff auth, staff integration, display, and synchronization. |
-| `npm run test:sql` | Offline PostgreSQL Test | **67 / 67 PASS** | Isolated PostgreSQL container tests verifying RLS, constraints, idempotency, timestamps, and permissions. |
-| `phase5-hosted.test.tsx` | Hosted TV & Owner Checkpoints | **10 / 10 PASS** | Live hosted checks for TV display, `/tv` redirect, zero PII, audio controls, `/admin` protection, owner metrics, duty RPCs. |
-| `phase4-hosted.test.tsx` | Hosted Staff Regression | **17 / 17 PASS** | Full customer-reception-barber lifecycle, Call Next, No-show timing, break controls, and role isolation. |
-| `npm run build` | TypeScript + Vite Production Build | **PASS** | 0 errors; code split into vendor chunks (`vendor-react`, `vendor-supabase`, `vendor-icons`), main chunk is only 145 kB. |
-| `npm run lint` | ESLint | **PASS** | 0 errors, 0 warnings across all files. |
-| `npm run check:edge` | Deno Type Check | **PASS** | Edge Function `salonq-api` compiles cleanly. |
-| `npm run env:check` | Environment Audit | **PASS** | HTTPS URL valid, publishable key valid, no service-role secrets in client, `.env.local` untracked. |
-| `npm run backend:probe` | Hosted Backend Probe | **PASS** | Supabase Auth reachable, public signup disabled, signal table reachable, migrations intact. |
+One pre-existing active customer was present. The test chose an otherwise eligible idle barber and checked the first eligible token before calling, so the existing customer was never called, cancelled or modified. All five audit entries were left terminal (one Done, four Cancelled). The separate React Join/Status test also cancelled only its own fictional entry; its failed first harness run cleaned its fixture before rerun. Historical demo results remain in statistics by design; they are not real salon business results.
 
----
+## Functional route/navigation results
 
-## 4. Security Audit & Release Safeguards
+All seven canonical screens and extra routes received HTTP 200 SPA documents on direct requests. Actual component navigation was separately exercised against hosted services:
 
-1. **No Credentials Committed**:
-   - `git check-ignore` confirms `.env.local` and `.artifacts/` are completely ignored and untracked.
-   - `.env.example` contains blank placeholders only.
-   - Staff passwords are encrypted using Windows DPAPI in local storage and never printed in logs or docs.
-2. **PostgreSQL Row-Level Security (RLS)**:
-   - All private tables (`salonq_entries`, `salonq_services`, `salonq_barbers`, `salonq_settings`, `salonq_staff_profiles`, `salonq_admission_receipts`) have RLS enabled.
-   - Anonymous clients are rejected with error `42501` on direct queries.
-3. **Private Schema & Authorization Facade**:
-   - Migration `20261124000400_staff_retry_authorization.sql` moved operational implementations to a private schema and revoked client execution.
-   - Public RPC `salonq_staff_command` checks current caller role and barber linkage on every call.
-4. **Public Display Privacy**:
-   - `/display` queries only the public projection `getPublicSalon()`.
-   - Inspection of DOM and network traffic confirms zero customer names, phone numbers, tracking capabilities, or private database IDs.
-5. **Realtime Invalidation Privacy**:
-   - Realtime channel listens on `salonq_changes`, which exposes only `version` and `changed_at`.
-   - Clients refetch authorized data based on their own role/capability; no customer or queue data is broadcast over WebSockets.
+- Home → Join through the real link; actual form admission → private Status; confirmed Waiting cancellation; private remount preserves terminal state; invalid link shows generic private-access guidance.
+- Public /display and /tv alias render authoritative public data. Unknown route renders Not Found.
+- Anonymous /reception, /barber/ravi and /admin redirect to Login without protected content.
+- Actual receptionist, Ravi, Amit, Imran and Owner logins redirect to their respective verified workspaces. Receptionist → Owner and Ravi → Amit routes are denied. All five sign-outs clear protected content.
+- English/Gujarati toggles change the headings and document language on Home, Join, private Status, public TV, Reception, all three Barber workspaces and Owner. This verifies translated DOM behavior, not font shaping or clipping.
 
----
+## Corrections from this review
 
-## 5. Viewport & Responsiveness Verification
+Fix commit: **a6a99f2** — fix: correct owner validation and TV synchronization feedback.
 
-The application design is built with mobile-first CSS using high-contrast champagne gold accents on charcoal backgrounds:
-- **Mobile (390 × 844)**: Responsive single-column layouts, accessible touch targets (≥44px), collapsible navigation, readable typography.
-- **Tablet (768 × 1024)**: Two-column grid layouts for barber cards and service catalog items.
-- **Desktop (1440 × 900)**: Full dashboard view with metrics cards, ordered tables, and sticky headers.
-- **Waiting Area TV (1920 × 1080)**: Large high-contrast token numbers, prominent barber station cards, clear Up Next section, and full-screen support.
-- **Bilingual Font Rendering**: Local WOFF2 fonts loaded via `@fontsource-variable`: Playfair Display (hero), Inter (UI), and Noto Sans Gujarati (Gujarati glyphs). Zero third-party CDN font requests.
+- Owner catalog now matches canonical names (2–80 Unicode characters, no controls), prices (₹0–100,000, at most two decimals including zero) and integer durations (1–480 minutes). Extra decimal prices are rejected rather than silently rounded; an open modal cannot submit stale/unverified data.
+- Owner live labels replace old “example” copy in both languages; average wait displays one decimal; busy/preference checks use stable barber IDs. Failed hours saves preserve the user's edits.
+- TV shows verified connection/stale feedback and no fictional fallback tokens. Clock uses a server offset. The five-second Called banner timeout survives the four-second polling refresh. Reconnect establishes a fresh notification baseline, avoiding historical call chimes.
+- Not Found no longer carries a fictional-preview banner. Existing design tokens/layout/branding are preserved. No dependencies added.
 
----
+## Acceptance checklist and submission limits
 
-## 6. Production Deployment & Live Verification
+The 91 scenario rows are deliberately unchanged: **34 previously evidenced PASS, 57 NOT RUN as complete scenarios**. New partial or differently scoped checks do not automatically certify an entire numbered scenario. Previous 17 Phase 4 / 10 Phase 5 hosted checkpoint claims are historical records, not freshly rerun counts.
 
-- **Production URL**: [https://salon-queue-snowy.vercel.app/](https://salon-queue-snowy.vercel.app/)
-- **GitHub Repository**: [https://github.com/202612019/Salon-Queue](https://github.com/202612019/Salon-Queue)
-- **Deployment Platform**: Vercel (Vite SPA) + Supabase (PostgreSQL, Edge Functions, Auth, Realtime)
-- **CORS & Preflight**: Preflight `OPTIONS` returns HTTP 204 with `Access-Control-Allow-Origin: https://salon-queue-snowy.vercel.app`. POST `public_snapshot` returns HTTP 200 with authoritative salon data (*The Atelier*, 3 services, 3 barbers).
-- **Supabase Auth Production Config**: `site_url` set to `https://salon-queue-snowy.vercel.app`; `additional_redirect_urls` includes production domain and local development origins.
-- **End-to-End Live Lifecycle Verification**:
-  1. Remote customer admitted with token `S-33` (HTTP 200).
-  2. Customer status initial: `waiting` (position 1).
-  3. Receptionist called customer with barber Ravi: `S-33 Ravi`.
-  4. Customer status dynamically updated to: `called` (assigned to Ravi).
-  5. Barber Ravi started service: status `in_chair` (version 3).
-  6. Barber Ravi completed service: status `done` (version 4).
-  7. Owner statistics updated: `served_today: 20`, `avg_wait: 1 min`, `no_shows_today: 0`.
-  8. Full queue lifecycle verified cleanly on live hosted Supabase from the production Vercel origin.
+The project is suitable for a working college demo subject to the unresolved rendered-device checks. It is not certified for real-customer production use; retention policy, broader device/accessibility/security review and operational monitoring remain future work. No OTP/SMS verification exists or is claimed. The default 21:00 closing blocks remote joins at 20:30 IST; walk-ins end at 21:00. Existing active entries continue after closing.
 
----
+## Evaluator access and publication
 
-## 7. Known Limitations
+Open /login on the production site. Demonstration identities: owner-demo@salonq.example, reception-demo@salonq.example, ravi-demo@salonq.example, amit-demo@salonq.example and imran-demo@salonq.example. Supply passwords privately to the evaluator. The local Copy-DemoPassword.ps1 helper can copy an existing DPAPI-protected password on the provisioning Windows account; never paste it into Git or this report. No accounts/passwords were recreated.
 
-1. **Audio Autoplay**: Modern browsers require user interaction before playing audio. An explicit "Enable sound" button unlocks the Web Audio chime.
-2. **Physical Device Testing**: Testing has been conducted via real PostgreSQL instances, jsdom DOM simulations, and live Supabase HTTP/WebSocket connections. Real physical device testing across varied hardware displays remains a recommended post-submission step.
+Both README files retain the verified production URL immediately below the title. Planning requirements, prompts, demo script and reflection are retained. The review scans all tracked content for actual demo passwords/privileged keys and excludes local environments, artifacts, dependencies and generated output. A pre-existing whitespace-only change in repository-root vercel.json is left untouched and excluded from these commits.
 
-
+Production release verification PASS at 19:47 IST: Vercel served all six expected JavaScript/CSS assets byte-for-byte identical (SHA-256 comparison) to the tested local build containing fix commit a6a99f2. This proves the verified corrections are deployed, rather than only committed locally. The final documentation commit uses the requested message `docs: finalize SalonQ live demo and submission materials`; its exact hash is reported by Git and the final response. No secret configuration was changed for deployment.

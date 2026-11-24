@@ -1,6 +1,6 @@
 # SalonQ — Project Brief & Scope
 
-**Version:** 1.6 | **Stage:** Phase 3 connects Home, Join and private My Status to the activated Supabase backend. Hosted React/jsdom verified admission, private resume, lost-response recovery, live status transitions and cancellation; staff/login/TV/Owner remain fictional previews. Five numbered acceptance cases passed with that scope; 86 remain unchecked. Earlier desktop design approval is retained, but no new rendered browser/mobile/Gujarati layout verification is claimed. See `phase-3-verification.md`, the application README and `supabase/README.md` for evidence/setup.
+**Stage:** Phases 4–6 are implemented and the Vercel production application is connected to the existing Supabase project. The 24 November independent verification reran 122 frontend tests, 67 isolated SQL assertions, 37 database/concurrency checks, 19 production-backed React/jsdom checkpoints, and a five-customer HTTP/WebSocket queue audit. Rendered viewport, clipping, physical-device and audible sound checks remain NOT RUN. See `final-verification.md`; the functional requirements below are unchanged.
 
 **Canonical project:** `D:/My Folder/Salon Queue/Salon-Queue/salon-queue-management`, inside the existing `Salon-Queue` Git checkout. These four documents are the sole implementation source of truth. The unchanged pre-Phase-0 reviewed set is archived outside Git at `../../planning-backups/2026-11-24-phase0-reviewed/`; archived copies are not active requirements. **College deadline:** 24 November 2026, 11:59 PM IST. Deliver the functional, secure MVP through small tasks; avoid unnecessary research and dependencies.
 
@@ -84,7 +84,7 @@ Customers read/cancel only their own capability-authorized entry, with cancellat
 
 ## Planned application structure
 
-Phase 1 implements the frontend foundation; Phase 2 adds backend/schema/service helpers; Phase 2.5 activates hosted services. Phase 3 connects only the three customer screens, with one shared sanitized subscription and separately authorized public/private snapshots. Explicit `/status/preview` and staff screens remain isolated fictional fixtures granting no staff access. An additive migration supplies per-barber public estimates from the existing authoritative estimator; original migrations and queue rules are unchanged.
+The frontend foundation, backend, hosted activation, customer experience, staff operations, Owner Settings and public TV are implemented. A shared sanitized subscription invalidates separately authorized snapshots. Only `/status/preview` and the explicitly labelled illustrative Home pass remain fictional UI examples. Staff access requires a verified account and protected role/profile. The additive public estimate and staff retry authorization migrations preserve the original queue rules.
 
 ```text
 salon-queue-management/

@@ -1,6 +1,6 @@
 # SalonQ — Screens & Features
 
-**Stage:** Phase 3 makes Home, Join and private My Status functional against the hosted backend while retaining the approved identity/layouts. Home uses real public data, Join has three visible steps and a sticky summary, and private Status retains/enhances the digital pass with circular estimates, progress, Called/arrival notices, private copying and confirmed cancellation. Explicit `/status/preview` and staff/Login/TV/Owner remain clearly fictional previews. No new rendered mobile/desktop/Gujarati verification is claimed. All seven screens remain required; remaining feature targets below still apply. Business rules in `03-flows-rules.md` govern operations.
+**Stage:** Phases 4–6 are implemented and the Vercel production application is connected to the existing Supabase project. The 24 November independent verification reran 122 frontend tests, 67 isolated SQL assertions, 37 database/concurrency checks, 19 production-backed React/jsdom checkpoints, and a five-customer HTTP/WebSocket queue audit. Rendered viewport, clipping, physical-device and audible sound checks remain NOT RUN. See `final-verification.md`; the functional requirements below are unchanged.
 
 ## Phase 1 desktop design approval and deferred refinements
 

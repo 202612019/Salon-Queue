@@ -4,7 +4,7 @@
 **Hosted on:** Vercel + Supabase  
 **Tagline:** *Your Time. Your Turn.*  
 
-> **Educational Project Notice:** SalonQ is an academic demonstration developed for a college Vibe Coding assignment. It uses fictional customer data and pre-provisioned demonstration accounts. Real customer personal or payment information is never requested.
+> **Educational Project Notice:** SalonQ is an academic demonstration developed for a college Vibe Coding assignment. It uses fictional customer data and pre-provisioned demonstration accounts. Use fictional names and phone numbers only; do not enter real customer information.
 
 ---
 
@@ -31,7 +31,7 @@ SalonQ introduces a transparent, multi-interface digital queue:
 - **Privacy-First Public Display**: The TV display (`/display`) exposes tokens only. Zero customer names, phone numbers, or private tracking keys appear on public screens.
 - **Serialized Eligible FCFS Engine**: Call Next atomically assigns the earliest waiting customer whose preference matches the calling barber or has selected "Any Barber".
 - **Transactional State Transitions**: PostgreSQL stored procedures enforce strict unidirectional lifecycle states (`waiting` → `called` → `in_chair` → `done`, `cancelled`, `no_show`). Statuses never move backward.
-- **Bilingual English & Gujarati Support**: Centralized i18n dictionaries provide instant one-click translation across all screens, with local WOFF2 font coverage (Noto Sans Gujarati) and zero layout clipping.
+- **Bilingual English & Gujarati Support**: Centralized i18n dictionaries provide instant one-click translation across all screens, with local WOFF2 font coverage (Noto Sans Gujarati) with functional EN/GU switching verified; rendered clipping checks remain pending.
 - **Sanitized Realtime Invalidation**: All screens subscribe exclusively to `salonq_changes`, triggering authorized snapshot refetches without streaming private queue tables across WebSockets.
 - **Ten-Minute No-Show Guard**: A customer who is called cannot be marked as a no-show until exactly 10 minutes (600 seconds) of server-measured time have elapsed.
 
@@ -51,10 +51,10 @@ SalonQ introduces a transparent, multi-interface digital queue:
 
 ## 4. Technology Stack
 
-- **Frontend**: React 19.3, TypeScript 5.8, React Router 8.5, Tailwind CSS 4.3, Lucide React icons.
+- **Frontend**: React 19.3, TypeScript 6.0, React Router 8.5, Tailwind CSS 4.3, Lucide React icons.
 - **Typography**: `@fontsource-variable/inter` (UI), `@fontsource-variable/playfair-display` (Headings), `@fontsource-variable/noto-sans-gujarati` (Gujarati). All locally bundled in WOFF2 format.
-- **Backend**: Supabase PostgreSQL 15, Deno Edge Functions, Supabase Auth.
-- **Realtime**: PostgreSQL Realtime broadcast via `salonq_changes` table invalidation.
+- **Backend**: Supabase PostgreSQL, Deno Edge Functions, Supabase Auth.
+- **Realtime**: Supabase Postgres Changes via `salonq_changes` table invalidation.
 - **Audio**: Zero-dependency Web Audio API harmonic tone synthesizer.
 - **Testing**: Vitest, React Testing Library, jsdom, pg offline test runner, Deno type-checking, ESLint.
 - **Hosting & CI/CD**: Vercel (Frontend SPA) + Supabase (Database, Auth & Edge Functions).
@@ -80,14 +80,16 @@ The application opens at `http://127.0.0.1:5173/` (or `http://127.0.0.1:5174/`).
 
 ## 6. Verification & Testing Evidence
 
-All automated test suites execute cleanly:
-- **`npm test`**: **108 / 108 PASS** (Unit and integration tests across 8 test suites).
+Latest executed checks are listed below. See [final verification](docs/final-verification.md) for evidence and limitations. The 91 numbered scenarios remain 34 PASS / 57 NOT RUN; this is not a claim that all scenarios passed.
+
+Additional fresh checks: **37 database/concurrency checks PASS**, **19 hosted React/jsdom checkpoints PASS**, **five concurrent customer admissions/status clients PASS**. Rendered viewport/screenshots and physical-device checks: **NOT RUN**.
+- **`npm test`**: **122 / 122 PASS** (Unit and integration tests across 9 test suites, rerun during the final independent review).
 - **`npm run test:sql`**: **67 / 67 PASS** (Real PostgreSQL assertions verifying RLS, transactions, and edge cases).
-- **`phase5-hosted.test.tsx`**: **10 / 10 PASS** (Live hosted checkpoints for TV, Owner, and security).
-- **`phase4-hosted.test.tsx`**: **17 / 17 PASS** (Live hosted regression checkpoints for staff operations).
+- **`phase5-hosted.test.tsx`**: **10 / 10 PASS** (Previously recorded hosted TV/Owner checkpoints; historical evidence, not rerun during this review).
+- **`phase4-hosted.test.tsx`**: **17 / 17 PASS** (Previously recorded hosted staff checkpoints; historical evidence, not rerun during this review).
 - **`npm run lint`**: **PASS** (0 errors, 0 warnings).
 - **`npm run build`**: **PASS** (TypeScript and Vite production bundle with optimized code splitting).
-- **`npm run env:check`**: **PASS** (Zero exposed secrets or untracked credentials).
+- **`npm run env:check`**: **PASS** (Local configuration is ignored/untracked; examples contain placeholders only).
 - **`npm run check:edge`**: **PASS** (Deno compilation check).
 - **`npm run backend:probe`**: **PASS** (Hosted Supabase connectivity probe).
 
