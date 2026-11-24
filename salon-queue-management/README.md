@@ -1,8 +1,8 @@
 # SalonQ — Smart Salon Queue Management
 
-**Phase 2: local Supabase backend foundation; hosted setup pending.** Your Time. Your Turn.
+**Phase 2.5: hosted backend activated and verified; frontend integration next.** Your Time. Your Turn.
 
-This application contains seven visually representative, read-only route previews, shared customer/staff layouts, a Lucide scissors wordmark, centralized charcoal/champagne-gold tokens, local typography, English/Gujarati dictionaries, a staff sign-in shell, Not Found handling and an application error boundary. Preview values are fictional. Staff preview pages are publicly viewable design fixtures, not authenticated staff sessions; no credentials are accepted and no queue or settings mutations occur through the UI. Phase 2 adds migrations, controlled database operations, the trusted Edge boundary and Auth/customer/synchronization service helpers. Hosted setup and screen integration remain pending. Follow [the backend setup guide](supabase/README.md) for exact operator steps.
+This application contains seven visually representative, read-only route previews, shared customer/staff layouts, a Lucide scissors wordmark, centralized charcoal/champagne-gold tokens, local typography, English/Gujarati dictionaries, a staff sign-in shell, Not Found handling and an application error boundary. Preview values are fictional. Staff preview pages are publicly viewable design fixtures, not authenticated staff sessions; no credentials are accepted and no queue or settings mutations occur through the UI. Phase 2 adds the trusted backend and service helpers; Phase 2.5 activates the hosted database/Auth/Edge/Realtime and verifies real operations. Screen integration remains pending. See [the backend setup and password guide](supabase/README.md).
 
 ## Run locally
 
@@ -107,4 +107,36 @@ The native PostgreSQL tests use fictional identities and a test-only Auth interf
 
 New pinned dependencies: runtime `@supabase/supabase-js@2.119.2`; development `pg@8.23.1`, `@types/pg@8.23.1`, `deno@2.9.6`. The existing approved visual system, routes, translations and preview restrictions are preserved. Backend service helpers are intentionally not imported by the screen previews, so no secret configuration or simulated live data is introduced into their rendered output.
 
-Stop at this foundation boundary. Complete hosted setup and verify it, then connect Home/Join, Status and staff features through separately approved feature tasks. Apply deferred targeted UI improvements during those tasks. Vercel deployment and push still require explicit approval.
+The Phase 2 table above is the historical closure record; Phase 2.5 below supersedes its pending hosted-setup status. Apply deferred targeted UI improvements during their feature tasks. Vercel deployment and push still require explicit approval.
+
+## Phase 2.5 hosted verification — 24 November 2026
+
+An authorized CLI 3.3.0 profile was available and matched the active PostgreSQL 17 project configured in `.env.local`, without printing configuration values. Both original migrations were applied in order through CLI migration history; the reproducible fictional seed was applied. No migration was rewritten, database reset performed, or hosted clock replaced. Four local origins on 127.0.0.1/localhost ports 5173/5174 are configured, with Auth Site URL `http://127.0.0.1:5174`.
+
+| Area | Actual hosted result |
+|---|---|
+| Signup and email provider | PASS — global signup disabled; real signup rejected with `signup_disabled`; provisioned email/password sign-in works |
+| Schema and authorization | PASS — all eight private tables have RLS and denied direct client grants; required functions, partial unique indexes and integrity triggers exist; service-only gateway and authenticated-only staff execution verified |
+| Seed and demo availability | PASS — three enabled bilingual services and Ravi/Amit/Imran; demo barbers On Duty, online admission enabled within existing hours |
+| Accounts | PASS — Owner, Receptionist, Ravi, Amit and Imran authenticate with protected profiles; each barber links to the correct record |
+| Edge deployment | PASS — existing `salonq-api` deployed using API bundling; 200 overview, exact CORS origin and `no-store` verified |
+| Queue and tracking | PASS — unique tokens, active-phone rejection, identical-request replay, receipt recovery, private tracking, generic invalid capability denial and retriable Waiting cancellation |
+| Staff operations | PASS — preference-aware Call Next, wrong-role/wrong-barber denial, own-barber projection, Start/Done, rejected backward transition, owner statistics/settings reads |
+| Realtime | PASS — actual anonymous Postgres Changes subscription and sanitized `{id,version,changed_at}` event; observed 1,942 ms from admission request start after listener readiness |
+| Public privacy | PASS — anonymous raw private-table/staff requests denied; overview/TV projection excludes customer PII, private queue IDs and tracking access |
+| Existing adapters | PASS — actual `customerOperation`, `signInStaff`, `staffOperation` and `signOutStaff` used against hosted services through Vite module loading |
+
+The final hosted smoke run passed **27 checks**. `supabase/verify-hosted.sql` separately returned true for all **14 metadata/seed checks**. A supplied `x-real-ip` header did not produce the caller-selected rate bucket; this is a limited proxy check, not a full abuse audit. Three final smoke admissions ended as two Done and one Cancelled; one earlier stopped-run Waiting fixture was cancelled through the real receptionist RPC. Fictional history is retained, without deleting queue records or resetting tokens.
+
+Necessary corrections discovered by real integration: the email-provider flag must stay enabled while global signup is disabled; and WebSocket `SUBSCRIBED` can precede the database listener. The first login and immediate-event checks failed for those reasons, then passed after correction. The synchronization helper now refetches on database-listener readiness as well as socket subscription, with three regression tests. The initial lint check rejected an unused test parameter; it was corrected before the successful final run. Supabase CLI cache exclusions were corrected for the nested canonical directory. No page/component/style/translation source was redesigned.
+
+| Final local check | Result |
+|---|---|
+| Environment safety and hosted probe | PASS — `.env.local` ignored/untracked; example values blank; Auth reachable, signup disabled, signal available |
+| `npm run build` | PASS — TypeScript/Vite, 1.73s Vite build |
+| `npm run lint` | PASS — zero warnings |
+| `npm run test` | PASS — 4 files, 41/41 tests |
+| `npm run check:edge` | PASS |
+| Password protection | PASS — Windows DPAPI encryption/decryption round trip; clipboard helper syntax checked; clipboard copying itself NOT RUN |
+
+The five fictional account emails and local password-copy procedure are in [the backend guide](supabase/README.md). Passwords are encrypted only in ignored `.artifacts/demo-accounts.dpapi.json`; no password or backend credential is committed. No activation-related manual action remains. The backend operations requested for Phase 3 are verified and ready for screen integration, which is not implemented yet. Browser layout/accessibility, cross-device screen updates/reconnect, hosted concurrency/timing matrices and the 91 complete application acceptance scenarios remain unverified/unchecked. The original 63 local SQL and 37 local integration checks remain historical local evidence, not new hosted passes. Stop after Phase 2.5; no Vercel deployment or push is performed.

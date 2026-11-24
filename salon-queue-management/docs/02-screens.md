@@ -1,6 +1,6 @@
 # SalonQ — Screens & Features
 
-**Stage:** Phase 1 frontend foundation remains clearly labeled, read-only previews. Phase 2 adds backend source/service helpers without changing the approved screen designs or enabling preview actions. Hosted setup and screen integration remain pending. Functional screen specifications below remain targets for later feature phases. All seven screens remain required. Business rules in `03-flows-rules.md` govern all operations. Only the canonical `salon-queue-management/` documents govern development.
+**Stage:** Phase 1 frontend foundation remains clearly labeled, read-only previews. Phase 2.5 activates/verifies the hosted backend and existing service adapters without redesigning screens or enabling preview actions. Phase 3 screen integration remains pending. Functional screen specifications below remain targets for later feature phases. All seven screens remain required. Business rules in `03-flows-rules.md` govern all operations. Only the canonical `salon-queue-management/` documents govern development.
 
 ## Phase 1 desktop design approval and deferred refinements
 

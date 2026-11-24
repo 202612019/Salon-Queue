@@ -206,3 +206,199 @@ The next user instructions were, in order:
 Continuation message received during this task:
 
 > continue
+
+## Phase 2.5 authorization — 24 November 2026
+
+> # Phase 2.5 — Hosted Supabase Activation and Integration Verification
+>
+> The Phase 2 local backend implementation is approved.
+>
+> Existing commits:
+>
+> - d969aad — Project planning documentation
+> - 45e0c7c — SalonQ frontend foundation
+> - 8463614 — Secure Supabase backend foundation
+>
+> Reported verification:
+>
+> - Production build: PASS
+> - Lint: PASS
+> - Edge type-check: PASS
+> - Automated tests: 38/38 PASS
+> - SQL assertions: 63 PASS
+> - Database integration checks: 37 PASS, including six concurrency cases
+>
+> Our submission deadline is tonight. Prioritize hosted backend activation and working functionality.
+>
+> ## 1. Review existing implementation
+>
+> Read:
+>
+> - AGENTS.md
+> - docs/01-brief.md
+> - docs/02-screens.md
+> - docs/03-flows-rules.md
+> - supabase/README.md
+> - All existing Supabase migrations
+> - Existing Edge Functions
+> - Existing backend service adapters
+>
+> Do not regenerate the backend, rewrite migrations unnecessarily, repeat repository research or redesign the frontend.
+>
+> ## 2. Verify hosted project configuration
+>
+> Inspect the existing .env.local without displaying its values.
+>
+> Verify:
+>
+> - Supabase project URL
+> - Publishable key format
+> - Git protection
+> - Correct target project
+> - Hosted project connectivity
+>
+> Determine whether an authorized Supabase CLI session or other supported management connection is available.
+>
+> The frontend publishable key does not authorize database migration or administrative operations.
+>
+> If additional authentication is required, provide the exact commands or dashboard actions I must complete locally.
+>
+> Do not ask me to send passwords, secret keys or access tokens into the conversation.
+>
+> ## 3. Activate hosted Supabase
+>
+> Follow the existing supabase/README.md instructions.
+>
+> Complete all authorized and feasible setup tasks:
+>
+> 1. Disable public staff signup while preserving provisioned staff sign-in.
+> 2. Apply existing database migrations in their correct order.
+> 3. Verify that all required tables, indexes, constraints and functions exist.
+> 4. Verify Row Level Security and database execution permissions.
+> 5. Apply reproducible fictional salon seed data.
+> 6. Configure sanitized Realtime publication.
+> 7. Configure the Edge Function's required environment variables and allowed origins.
+> 8. Include the current local development origin, http://127.0.0.1:5174, where appropriate.
+> 9. Deploy the existing Edge Function.
+> 10. Verify the deployed function responds correctly.
+>
+> Do not disable RLS or weaken authorization to resolve setup errors.
+>
+> Do not execute destructive database resets.
+>
+> If hosted setup requires actions that I must perform manually, pause only those dependent operations and give me exact instructions, including the relevant file paths and commands.
+>
+> Continue any independent verification that remains possible.
+>
+> ## 4. Provision fictional demonstration accounts
+>
+> Provision role-limited demo accounts for:
+>
+> - Receptionist
+> - Owner
+> - Ravi — Barber
+> - Amit — Barber
+> - Imran — Barber
+>
+> Use Supabase Auth and protected staff_profiles records.
+>
+> Ensure each barber is associated with the correct barber record.
+>
+> Use fictional identities.
+>
+> Do not enable public staff registration.
+>
+> Do not grant administrator or service-role privileges to demonstration users.
+>
+> Provide a secure local procedure for assigning and managing demonstration passwords.
+>
+> Do not commit passwords or privileged keys.
+>
+> ## 5. Hosted backend smoke tests
+>
+> Actually verify the following wherever hosted access permits:
+>
+> - Public salon overview is accessible.
+> - Enabled services are available.
+> - Safe barber availability is available.
+> - Anonymous requests cannot read private queue records.
+> - Customer admission generates a unique token.
+> - Duplicate active phone numbers are rejected safely.
+> - Admission retries do not create duplicate entries.
+> - Private customer tracking works.
+> - Invalid tracking capabilities are rejected.
+> - Receptionist authentication works.
+> - Owner authentication works.
+> - Barber authentication and role isolation work.
+> - Call Next respects barber preferences.
+> - Start and Done enforce valid transitions.
+> - Sanitized realtime signals arrive after successful mutations.
+> - Public TV payloads do not expose personal information.
+>
+> Use fictional test records only.
+>
+> Respect operating-hour and other business rules during testing. Use the existing isolated test mechanisms for timing-boundary scenarios rather than weakening hosted business rules.
+>
+> Distinguish local test results from hosted test results.
+>
+> Do not mark unexecuted checks as passed.
+>
+> ## 6. Prepare frontend integration
+>
+> Confirm that existing typed services and hooks can communicate with the deployed backend.
+>
+> Report whether the following operations are ready for Phase 3:
+>
+> - Public salon overview
+> - Service catalog
+> - Barber availability
+> - Customer admission
+> - Private status tracking
+> - Customer cancellation
+> - Staff authentication
+> - Reception operations
+> - Barber operations
+> - Owner operations
+> - Realtime subscriptions
+>
+> Do not redesign or regenerate existing frontend pages.
+>
+> ## 7. Security and Git requirements
+>
+> - Keep .env.local ignored and untracked.
+> - Keep .env.example limited to placeholders.
+> - Never expose privileged credentials in frontend code.
+> - Preserve existing commits.
+> - Commit only necessary setup corrections or documentation changes.
+> - Do not push without approval.
+> - Do not deploy the frontend to Vercel yet.
+>
+> ## 8. Final report
+>
+> Provide:
+>
+> 1. Hosted Supabase setup status.
+> 2. Applied migration status.
+> 3. Database tables and function verification.
+> 4. Seed data status.
+> 5. Staff account provisioning status.
+> 6. Edge Function deployment status.
+> 7. Realtime verification.
+> 8. Hosted smoke-test results.
+> 9. Remaining manual actions, if any.
+> 10. Changed files and Git status.
+> 11. Readiness for functional frontend integration.
+>
+> IMPORTANT:
+>
+> Do not spend time rebuilding the existing backend.
+>
+> If you require my intervention, give me the exact next command or dashboard action instead of another lengthy planning report.
+>
+> Complete hosted backend activation and verification before declaring readiness for Phase 3.
+>
+> Stop after Phase 2.5.
+
+Additional user instruction:
+
+> remember we have complete project before today night so work fast

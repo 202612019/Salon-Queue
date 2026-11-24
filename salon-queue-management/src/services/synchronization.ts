@@ -20,6 +20,12 @@ export function synchronizeSnapshot<T>(load: (signal: AbortSignal) => Promise<T>
   }
   const invalidate = () => { clearTimeout(debounce); debounce = setTimeout(() => void refetch(), 75) }
   const channel = getSupabaseClient().channel(`salonq-signal-${crypto.randomUUID()}`)
+    // WebSocket SUBSCRIBED can precede the database listener. Reconcile again
+    // when the Postgres extension becomes ready so writes in that gap are read.
+    .on('system', {}, payload => {
+      if (payload.extension === 'postgres_changes' && payload.status === 'ok') void refetch()
+      else if (payload.extension === 'postgres_changes' && payload.status === 'error') publish({ connection: 'stale' })
+    })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'salonq_changes' }, invalidate)
     .subscribe(status => { if (status === 'SUBSCRIBED') void refetch(); else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') publish({ connection: 'stale' }) })
   const online = () => void refetch()

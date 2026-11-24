@@ -14,12 +14,15 @@ major_version = 17
 
 [auth]
 enabled = true
-site_url = "http://127.0.0.1:5173"
-additional_redirect_urls = ["http://127.0.0.1:5174"]
+site_url = "http://127.0.0.1:5174"
+additional_redirect_urls = ["http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://localhost:5173", "http://localhost:5174"]
 enable_signup = false
+enable_anonymous_sign_ins = false
 
 [auth.email]
-enable_signup = false
+# This enables the email provider. Global auth.enable_signup=false blocks new users.
+# Setting this false also disables provisioned staff password sign-in.
+enable_signup = true
 enable_confirmations = true
 
 [functions.salonq-api]

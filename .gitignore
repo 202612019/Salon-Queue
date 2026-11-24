@@ -10,8 +10,8 @@ coverage/
 .artifacts/
 test-results/
 playwright-report/
-supabase/.temp/
-supabase/.branches/
+**/supabase/.temp/
+**/supabase/.branches/
 supabase/functions/.env
 supabase/functions/.env.*
 !supabase/functions/.env.example

@@ -1,6 +1,16 @@
-# SalonQ — Phase 2 backend foundation
+# SalonQ — Supabase backend setup and verification
 
-Run commands from `Salon-Queue/salon-queue-management/`. The backend source is implemented locally. It has **not** been applied/deployed to the user's hosted project. The approved UI remains a fictional, disabled preview; setting environment variables or deploying this backend does not enable its controls. Screen integration belongs to subsequent feature tasks.
+Run commands from `Salon-Queue/salon-queue-management/`. **Phase 2.5 hosted activation completed on 24 November 2026:** both existing migrations and fictional seed applied, signup disabled, five protected demo staff accounts provisioned, `salonq-api` deployed, and 27 hosted smoke checks passed. Database metadata checks passed and a sanitized realtime event was observed 1,942 ms after a mutation request began. The approved UI remains a fictional, disabled preview; deploying this backend does not enable its controls. Backend service integration is verified; screen integration belongs to Phase 3. See the application README for the verification record.
+
+Demo emails: `owner-demo@salonq.example`, `reception-demo@salonq.example`, `ravi-demo@salonq.example`, `amit-demo@salonq.example`, `imran-demo@salonq.example`. These have application roles only and no platform administrator/service-role privileges. All three fictional barbers are now On Duty and online admission is enabled, subject to unchanged 10:00–21:00 IST hours and the 20:30 remote cutoff.
+
+Passwords are random and stored only in the ignored `.artifacts/demo-accounts.dpapi.json`, encrypted with Windows DPAPI for the current Windows user/machine. No plaintext password or privileged key file was created. Copy one password locally without printing it:
+
+```powershell
+./scripts/Copy-DemoPassword.ps1 -Email owner-demo@salonq.example
+```
+
+Paste within 30 seconds and leave that terminal open for clipboard cleanup. Use another listed email for another account. The clipboard action itself has not been run by the agent; script syntax and DPAPI encryption/decryption were checked separately. For password rotation use Dashboard Authentication → Users for the specific fictional user, set a new strong password locally, and keep it in your password manager; the saved vault then contains the old password for that user. Do not send passwords or tokens into chat or Git. The app login screen remains a preview until Phase 3.
 
 ## What is included
 
@@ -22,30 +32,30 @@ npm run backend:probe
 
 `env:check` prints booleans only: URL/key format, absence of privileged frontend variable names, Git exclusion and blank example values. It does not print credentials or prove that the URL and key belong to the same project. `backend:probe` makes read-only requests to hosted Auth settings and the sanitized signal table; it never provisions users or changes hosted state. Its results are booleans only.
 
-During Phase 2 the probe reached Auth, observed **public signup still enabled**, and could not read the signal table. Public URL/publishable credentials provide no project-management or migration authorization. `.env.local` was not changed. No privileged credential is required in the browser or this repository.
+During Phase 2 the probe observed signup enabled and the signal table unavailable. Phase 2.5 found an authorized CLI profile, matched its active project to `.env.local`, and activated that project. The final probe reports Auth reachable, signup disabled and signal reads available. Public URL/publishable credentials alone still provide no administrative authority. `.env.local` was not changed. No privileged credential is required in the browser or committed to this repository.
 
-## Hosted setup — operator action required
+## Reproduce setup on a fresh authorized project
 
-Use a dedicated fictional-data project. The following are exact manual steps; none have been executed remotely by the agent.
+Use a dedicated fictional-data project. The existing configured project is already activated; do not reapply migration SQL or recreate its accounts. The following steps document reproduction and future operator maintenance.
 
 ### 1. Disable public signup
 
 In Supabase Dashboard, open **Authentication → Sign In / Providers** (the general user-access configuration), turn **Allow new users to sign up** OFF and save. Keep email/password sign-in enabled for provisioned staff. Disable anonymous sign-ins and unused providers. `supabase/config.toml` disables signup for a local stack; it does not change an existing hosted project. See [Supabase Auth general configuration](https://supabase.com/docs/guides/auth/general-configuration).
 
-For local development, set Auth Site URL to `http://127.0.0.1:5173` and allow `http://127.0.0.1:5174` if used. Add a real deployment origin only during the approved deployment task.
+For local development the current Auth Site URL is `http://127.0.0.1:5174`; the four exact 127.0.0.1/localhost origins on ports 5173/5174 are allowed. Keep `[auth] enable_signup=false` but **`[auth.email] enable_signup=true`**: this provider-specific flag enables email/password sign-in. Setting it false was demonstrated to return `email_provider_disabled` for provisioned users. Global signup remains off, and an actual anonymous signup attempt was rejected with `signup_disabled`. Add a real deployment origin only during the approved deployment task.
 
 ### 2. Apply migrations
 
-Preferred CLI path (requires a Supabase account with access to the project, project reference and database password):
+Preferred pinned CLI 3.3.0 path (requires an authorized Supabase profile and the correct project reference):
 
 ```powershell
 npx supabase@3.3.0 login
-npx supabase@3.3.0 link --project-ref YOUR_PROJECT_REF
-npx supabase@3.3.0 db push --dry-run
-npx supabase@3.3.0 db push
+npx supabase@3.3.0 link YOUR_PROJECT_REF
+npx supabase@3.3.0 db push --remote=YOUR_PROJECT_REF --dry-run --skip-vault
+npx supabase@3.3.0 db push --remote=YOUR_PROJECT_REF --skip-vault --yes
 ```
 
-Replace `YOUR_PROJECT_REF` with the project reference from Dashboard. Use the CLI's secure prompt for the database password. Do not put the password in a command, Git, a Vite variable or chat. Inspect the dry run: it should list only `20261124000100_salonq_schema.sql` then `20261124000200_salonq_operations.sql`. Do not use reset against this hosted project. See [Supabase CLI migration commands](https://supabase.com/docs/reference/cli/introduction).
+Replace `YOUR_PROJECT_REF` with the project reference from Dashboard and match it to the hostname in `.env.local` before writes. CLI 3.3 defaults database commands to local unless `--remote` is explicit. The authenticated profile applied these migrations without asking for a database password. If a later operation requires a password, use a secure local prompt; never put it in Git, a Vite variable or chat. On a fresh project the dry run should list only `20261124000100_salonq_schema.sql` then `20261124000200_salonq_operations.sql`. On this activated project both are already recorded in migration history. Do not reset the hosted project. See [Supabase CLI migration commands](https://supabase.com/docs/reference/cli/introduction).
 
 Alternative if CLI login is unavailable: open Dashboard **SQL Editor**, copy and run each complete migration file in that order. Each file has its own transaction. Run each only once. Do not subsequently run `db push` blindly: Dashboard execution does not populate the CLI migration history; reconcile that history before switching methods.
 
@@ -91,7 +101,7 @@ Use exact origins, no trailing slash, no wildcard. Add the approved production o
 From the linked application directory:
 
 ```powershell
-npx supabase@3.3.0 functions deploy salonq-api --no-verify-jwt
+npx supabase@3.3.0 functions deploy salonq-api --remote=YOUR_PROJECT_REF --no-verify-jwt --use-api --yes
 ```
 
 `verify_jwt=false` is intentional for public/capability requests. Staff walk-ins explicitly validate the actual session JWT using Auth `getUser`; the database independently checks the protected role. Direct staff RPCs require authenticated JWTs and derive their actor from `auth.uid()`. A publishable API key is not a staff identity. Do not replace these checks with browser roles. See [Supabase function deployment](https://supabase.com/docs/guides/functions/deploy) and [authorization headers](https://supabase.com/docs/guides/functions/auth-headers).
@@ -110,9 +120,17 @@ select has_function_privilege('authenticated', 'public.salonq_staff_command(text
 select schemaname, tablename from pg_publication_tables where pubname='supabase_realtime';
 ```
 
-Then test real sessions for Owner, Receptionist and linked Barber, generic denial for an unprovisioned account, and actual Realtime subscriptions. Confirm the gateway overwrites trusted client-IP headers before relying on per-IP abuse limits; do not treat caller-supplied forwarding headers as identity. Capability limits remain shared database counters. Hosted Auth revocation, browser reconnect behavior and five-second cross-device delivery require integrated QA, not only SQL inspection.
+Phase 2.5 tested real sessions for Owner, Receptionist and all three linked Barbers, role-isolated operations, an actual denied signup, and actual anonymous Realtime subscription/delivery. A harmless caller-supplied `x-real-ip` probe did not create the corresponding caller-controlled hashed rate bucket, confirming that supplied header was not trusted by this deployed path. This single probe is not a comprehensive proxy/abuse audit. Capability limits remain shared database counters. Hosted Auth revocation, browser reconnect behavior and five-second cross-device screen delivery still require integrated QA.
 
-Online admission intentionally remains closed with Off Duty barbers until an owner configures them. If a fictional backend-only demo is needed before the owner UI exists, this trusted SQL block enables only the seeded Ravi and the online switch, while preserving versioning and invalidation:
+Run the credential-safe metadata verification again with:
+
+```powershell
+npx supabase@3.3.0 db query --remote=YOUR_PROJECT_REF --read-only --file supabase/verify-hosted.sql
+```
+
+Realtime's WebSocket `SUBSCRIBED` state can precede the database listener. The first hosted smoke run exposed this gap. Wait for the `system` event reporting `extension=postgres_changes` and `status=ok` before using a mutation to test delivery; the client helper now performs another authorized refetch at that point. Its four-second foreground fallback remains. See [Supabase's readiness troubleshooting](https://supabase.com/kb/troubleshooting/realtime-postgres-changes-troubleshooting).
+
+On a freshly seeded project, admission starts closed with Off Duty barbers until an owner configures them. Phase 2.5 already activated this project's three demo barbers through real owner RPCs. On a different fresh fictional project before the owner UI exists, this trusted SQL block enables only seeded Ravi and the online switch, while preserving versioning and invalidation:
 
 ```sql
 begin;
@@ -157,10 +175,10 @@ For the separate **concurrent-connection** runner, initialize a second disposabl
 
 In another terminal, from the application directory, run `npm run test:db`. Stop only that dedicated test server with Ctrl+C when finished. The runner refuses hosted URLs and checks the server data directory before creating a unique test database. Trust authentication is only for these loopback disposable fictional test clusters. Do not use it for hosted or real customer data. Early connection-refused/timeout attempts in the execution environment were resolved by running the server and test runner in one execution with cleanup. The final run passed **37 integration checks**, including six independent-connection race cases: same-barber Call Next, duplicate-phone admissions, identical request retries, two barbers/one Any customer, cancellation/Call Next, and Start/eligible No-show. This is local PostgreSQL evidence only; hosted Auth/Edge/Realtime and the full numbered application scenarios remain unverified.
 
-## Phase 2 limitations and next work
+## Current limitations and next work
 
-- Hosted migrations, Edge deployment, signup configuration and staff provisioning require the operator steps above; no remote configuration was changed.
+- Hosted migrations, Edge deployment, signup configuration, seed and all five staff profiles are applied and smoke-tested. No activation-related operator action remains.
 - No functional screen/login integration, live statistics or successful queue action is presented by the frontend yet.
 - All 91 numbered application acceptance scenarios remain unchecked. Local foundation tests are reported separately.
-- Concurrent races, hosted RLS/Auth behavior, five-second Realtime delivery, refresh-token revocation and real browser accessibility/responsiveness remain unverified.
+- Hosted RLS/grants, real Auth/profile checks and one measured sanitized realtime delivery are verified. Hosted concurrency races, browser/cross-device reconnect behavior, refresh-token revocation and rendered accessibility/responsiveness remain unverified; the 37 local integration checks are separate evidence.
 - No Vercel deployment, push, real customer data or staff passwords are included.
