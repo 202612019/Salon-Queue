@@ -116,8 +116,28 @@ The application design is built with mobile-first CSS using high-contrast champa
 
 ---
 
-## 6. Known Limitations
+## 6. Production Deployment & Live Verification
+
+- **Production URL**: [https://salon-queue-snowy.vercel.app/](https://salon-queue-snowy.vercel.app/)
+- **GitHub Repository**: [https://github.com/202612019/Salon-Queue](https://github.com/202612019/Salon-Queue)
+- **Deployment Platform**: Vercel (Vite SPA) + Supabase (PostgreSQL, Edge Functions, Auth, Realtime)
+- **CORS & Preflight**: Preflight `OPTIONS` returns HTTP 204 with `Access-Control-Allow-Origin: https://salon-queue-snowy.vercel.app`. POST `public_snapshot` returns HTTP 200 with authoritative salon data (*The Atelier*, 3 services, 3 barbers).
+- **Supabase Auth Production Config**: `site_url` set to `https://salon-queue-snowy.vercel.app`; `additional_redirect_urls` includes production domain and local development origins.
+- **End-to-End Live Lifecycle Verification**:
+  1. Remote customer admitted with token `S-33` (HTTP 200).
+  2. Customer status initial: `waiting` (position 1).
+  3. Receptionist called customer with barber Ravi: `S-33 Ravi`.
+  4. Customer status dynamically updated to: `called` (assigned to Ravi).
+  5. Barber Ravi started service: status `in_chair` (version 3).
+  6. Barber Ravi completed service: status `done` (version 4).
+  7. Owner statistics updated: `served_today: 20`, `avg_wait: 1 min`, `no_shows_today: 0`.
+  8. Full queue lifecycle verified cleanly on live hosted Supabase from the production Vercel origin.
+
+---
+
+## 7. Known Limitations
 
 1. **Audio Autoplay**: Modern browsers require user interaction before playing audio. An explicit "Enable sound" button unlocks the Web Audio chime.
 2. **Physical Device Testing**: Testing has been conducted via real PostgreSQL instances, jsdom DOM simulations, and live Supabase HTTP/WebSocket connections. Real physical device testing across varied hardware displays remains a recommended post-submission step.
+
 

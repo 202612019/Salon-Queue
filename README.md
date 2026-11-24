@@ -1,6 +1,6 @@
 # SalonQ — Smart Salon Queue Management
 
-**Live Demo:** [https://salon-queue-management.vercel.app](https://salon-queue-management.vercel.app) *(or your deployed Vercel URL)*  
+**Live Demo:** [https://salon-queue-snowy.vercel.app/](https://salon-queue-snowy.vercel.app/)  
 **Hosted on:** Vercel + Supabase  
 **Tagline:** *Your Time. Your Turn.*  
 
