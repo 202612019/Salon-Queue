@@ -29,7 +29,7 @@ describe('frontend route shells', () => {
     openPage(path)
     expect(screen.getAllByRole('main')).toHaveLength(1)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(heading)
-    if (['/status/preview', '/display', '/unknown-page'].includes(path)) expect(screen.getByText(en.previewDetail)).toBeVisible()
+    if (path === '/status/preview') expect(screen.getByText(en.previewDetail)).toBeVisible()
     else expect(screen.queryByText(en.previewDetail)).not.toBeInTheDocument()
   })
 
@@ -68,9 +68,9 @@ describe('frontend route shells', () => {
     expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
   })
 
-  it('never includes customer identities on the public TV preview', () => {
+  it('never includes customer identities or fabricated tokens on the unverified public TV', () => {
     openPage('/display')
-    expect(screen.getByText('S-012')).toBeVisible()
+    expect(screen.queryByText('S-012')).not.toBeInTheDocument()
     for (const name of ['Kunal', 'Neel', 'Arjun', 'Dhruv', 'Mihir']) expect(screen.queryByText(name)).not.toBeInTheDocument()
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
   })
@@ -79,7 +79,7 @@ describe('frontend route shells', () => {
     Object.defineProperty(document.documentElement, 'requestFullscreen', { configurable: true, value: vi.fn().mockRejectedValue(new Error('Denied')) })
     openPage('/display')
     fireEvent.click(screen.getByRole('button', { name: en.fullscreen }))
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(en.fullscreenUnavailable))
+    await waitFor(() => expect(screen.getByText(en.fullscreenUnavailable)).toBeVisible())
   })
 
   it('announces offline state and keeps the preview available', () => {

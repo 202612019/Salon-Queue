@@ -30,7 +30,7 @@ export function CustomerLayout() {
 function CustomerShell() {
   const { t } = useLocale()
   const { pathname } = useLocation()
-  const preview = pathname === '/status/preview' || (pathname !== '/' && pathname !== '/join' && pathname !== '/login' && !pathname.startsWith('/status/'))
+  const preview = pathname === '/status/preview'
   return <><a className="skip-link" href="#main-content">{t('skip')}</a><Header /><OfflineNotice />{preview && <div className="container"><PreviewBanner /></div>}<main id="main-content" tabIndex={-1} className="container customer-main"><Outlet /></main><Footer /></>
 }
 export function StaffLayout() {

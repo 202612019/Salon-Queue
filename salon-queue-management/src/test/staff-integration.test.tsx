@@ -180,11 +180,36 @@ describe('server-offset timer display helpers', () => {
   })
 })
 describe('Owner operational management', () => {
+  it('keeps occupied barber controls disabled using stable IDs even when names differ', async () => {
+    owner.entries[0] = { ...owner.entries[0], status: 'called', assigned_barber: { id: owner.barbers[0].id, name: 'Different display name' } }
+    signIn('owner'); open('/admin')
+    await screen.findByRole('heading', { name: en.adminTitle })
+    const row = screen.getByText(owner.barbers[0].display_name).closest('.setting-row') as HTMLElement
+    expect(within(row).getByRole('button', { name: en.takeBreak })).toBeDisabled()
+    expect(within(row).getByText(en.called)).toBeVisible()
+  })
+
+  it('preserves edited hours after a stale save is rejected', async () => {
+    mock.command.mockImplementation(async (action: string) => {
+      if (action === 'save_settings') throw new BackendError('STALE_VERSION')
+      return structuredClone(owner)
+    })
+    signIn('owner'); const user = userEvent.setup(); open('/admin')
+    await screen.findByRole('heading', { name: en.adminTitle })
+    await user.clear(screen.getByLabelText(en.opens))
+    await user.type(screen.getByLabelText(en.opens), '09:00')
+    await user.click(screen.getByRole('button', { name: en.saveHours }))
+    await user.click(screen.getByRole('button', { name: en.confirmAction }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(screen.getByLabelText(en.opens)).toHaveValue('09:00')
+    expect(screen.getByText(en.staffConflict)).toBeVisible()
+  })
+
   it('loads live statistics, opening hours, services, and team duty', async () => {
     signIn('owner'); open('/admin')
     expect(await screen.findByRole('heading', { name: en.adminTitle })).toBeVisible()
     expect(screen.getByText('05')).toBeVisible()
-    expect(screen.getByText('24 min')).toBeVisible()
+    expect(screen.getByText('24.0 min')).toBeVisible()
     expect(screen.getByText('01')).toBeVisible()
     expect(screen.getByText(salonFixture.services[0].name_en)).toBeVisible()
     expect(screen.getByText(salonFixture.barbers[0].display_name)).toBeVisible()

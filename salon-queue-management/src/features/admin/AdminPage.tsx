@@ -77,9 +77,11 @@ export function AdminPage() {
           closing_time: closingTime + ':00',
           online_enabled: data.settings.online_enabled,
           version: data.settings.version,
-        }).then(() => {
-          setEditedOpening(null)
-          setEditedClosing(null)
+        }).then(result => {
+          if (result) {
+            setEditedOpening(null)
+            setEditedClosing(null)
+          }
         }).finally(() => setConfirmModal(null))
       },
     })
@@ -160,7 +162,7 @@ export function AdminPage() {
         />
         <Metric
           label={t('averageWait')}
-          value={data?.statistics?.average_wait_minutes != null ? t('minutesCount', { count: Math.round(data.statistics.average_wait_minutes) }) : '—'}
+          value={data?.statistics?.average_wait_minutes != null ? t('minutesCount', { count: new Intl.NumberFormat(locale === 'gu' ? 'gu-IN' : 'en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(data.statistics.average_wait_minutes) }) : '—'}
           hint={t('joinToCall')}
           icon={Clock3}
         />
@@ -288,12 +290,13 @@ export function AdminPage() {
         <div className="team-duty-grid">
           {data?.barbers.map(barber => {
             const isOccupied = data.entries?.some(
-              e => e.assigned_barber?.name.toLowerCase() === barber.slug && ['called', 'in_chair'].includes(e.status)
+              e => e.assigned_barber?.id === barber.id && ['called', 'in_chair'].includes(e.status)
             )
             const hasWaiting = data.entries?.some(
-              e => e.status === 'waiting' && e.preferred_barber?.name.toLowerCase() === barber.slug
+              e => e.status === 'waiting' && e.preferred_barber?.id === barber.id
             )
-            const badgeState = !barber.on_duty ? 'offDuty' : barber.on_break ? 'onBreak' : 'available'
+            const current = data.entries?.find(e => e.assigned_barber?.id === barber.id && ['called', 'in_chair'].includes(e.status))
+            const badgeState = !barber.on_duty ? 'offDuty' : barber.on_break ? 'onBreak' : current?.status === 'called' ? 'called' : current ? 'inChair' : 'available'
             return (
               <div className="setting-row" key={barber.id}>
                 <div className="barber-identity">
@@ -330,6 +333,7 @@ export function AdminPage() {
         <ServiceModal
           service={editingService === 'new' ? null : editingService}
           busy={command.busy}
+          disabled={!fresh || command.pending}
           onSave={handleSaveService}
           onClose={() => setEditingService(null)}
         />

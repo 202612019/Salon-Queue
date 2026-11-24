@@ -109,4 +109,31 @@ describe('Waiting Area TV Display (/display)', () => {
     expect(await screen.findByText('S-042')).toBeVisible()
     expect(screen.getByText(en.proceedTo.replace('{token}', 'S-042').replace('{barber}', fixtureWithCalled.barbers[0].display_name))).toBeVisible()
   })
+
+  it('shows a stale connection warning and no fictional tokens when the first read fails', async () => {
+    mock.public.mockRejectedValue(new Error('BACKEND_UNAVAILABLE'))
+    open('/display')
+    expect(await screen.findByText(en.staleData)).toBeVisible()
+    expect(screen.getByRole('button', { name: en.retry })).toBeVisible()
+    expect(screen.queryByText(en.preview)).not.toBeInTheDocument()
+    expect(document.querySelectorAll('.display-token')).toHaveLength(0)
+  })
+
+  it('expires a Called banner even when a polling refresh arrives before five seconds', async () => {
+    open('/display')
+    await screen.findByText(salonFixture.salon_name)
+    const { act } = await import('@testing-library/react')
+    const called = structuredClone(salonFixture)
+    called.barbers[0].token = 'S-042'
+    called.barbers[0].status = 'called'
+    mock.public.mockResolvedValue(called)
+    vi.useFakeTimers()
+    try {
+      await act(async () => { await Promise.all([...mock.refresh].map(refresh => refresh())) })
+      expect(document.querySelector('.display-announcement')).toBeInTheDocument()
+      await act(async () => { vi.advanceTimersByTime(4000); await Promise.all([...mock.refresh].map(refresh => refresh())) })
+      await act(async () => { vi.advanceTimersByTime(1100) })
+      expect(document.querySelector('.display-announcement')).not.toBeInTheDocument()
+    } finally { vi.useRealTimers() }
+  })
 })

@@ -8,7 +8,7 @@ export const staffEn = {
   confirmSettingsTitle: 'Update salon settings?', confirmSettingsBody: 'Changing opening hours or queue availability directly affects online customer admissions.',
   confirmCloseOnlineTitle: 'Close online queue?', confirmCloseOnlineBody: 'Customers will not be able to join online until reopened. Existing queue entries and walk-ins remain valid.',
   teamDutyHint: 'Manage barber availability. Active assignments must be completed before taking a barber off duty.',
-  invalidServiceName: 'Enter a valid service name.', invalidServicePrice: 'Enter a valid price in rupees.', invalidServiceDuration: 'Duration must be between 5 and 240 minutes.',
+  invalidServiceName: 'Use 2–80 characters without control characters.', invalidServicePrice: 'Enter ₹0–100,000 with at most two decimal places.', invalidServiceDuration: 'Enter a whole number from 1 to 480 minutes.', serviceDurationHint: '1–480 min',
 } as const
 export const staffGu: Record<keyof typeof staffEn, string> = {
   restoringSession: 'સ્ટાફ સત્ર ચકાસાઈ રહ્યું છે…', signingIn: 'સુરક્ષિત રીતે સાઇન ઇન થઈ રહ્યું છે…', authFailed: 'સાઇન ઇન થયું નથી. સ્ટાફ ઇમેઇલ અને પાસવર્ડ તપાસો.', staffForbidden: 'આ ખાતાને માગેલા સ્ટાફ પ્રવેશની મંજૂરી નથી.', sessionExpired: 'સ્ટાફ સત્ર ચકાસી શકાયું નથી. ફરી સાઇન ઇન કરો.', signOut: 'સાઇન આઉટ', showPassword: 'પાસવર્ડ બતાવો', hidePassword: 'પાસવર્ડ છુપાવો', invalidEmail: 'માન્ય સ્ટાફ ઇમેઇલ દાખલ કરો.', passwordRequired: 'તમારો સ્ટાફ પાસવર્ડ દાખલ કરો.', secureStaffHint: 'સુરક્ષિત સ્ટાફ નોંધો સામે પ્રવેશ ચકાસાય છે. જાહેર નોંધણી નથી.', myWorkspace: 'મારું કાર્યસ્થળ', accessDenied: 'તમારી ભૂમિકા માટે આ કાર્યસ્થળ ઉપલબ્ધ નથી.', accessDeniedBody: 'તમારું અધિકૃત કાર્યસ્થળ વાપરો. URL બદલવાથી પરવાનગી બદલાતી નથી.', ownerPending: 'માલિક સેટિંગ્સ ફેઝ ૫માં આવશે. નીચે માત્ર કાલ્પનિક, વાંચી શકાય તેવું ડિઝાઇન પૂર્વાવલોકન છે. નેવિગેશનથી રિસેપ્શન વાપરી શકાય છે.',
@@ -20,5 +20,5 @@ export const staffGu: Record<keyof typeof staffEn, string> = {
   confirmSettingsTitle: 'સલૂન સેટિંગ્સ અપડેટ કરવા છે?', confirmSettingsBody: 'સમય કે કતાર સ્થિતિ બદલવાથી ઓનલાઇન ગ્રાહક નોંધણી પર સીધી અસર થશે.',
   confirmCloseOnlineTitle: 'ઓનલાઇન કતાર બંધ કરવી છે?', confirmCloseOnlineBody: 'ફરી ચાલુ ન થાય ત્યાં સુધી ગ્રાહકો ઓનલાઇન જોડાઈ શકશે નહીં. હાલના ગ્રાહકો અને વોક-ઇન ચાલુ રહેશે.',
   teamDutyHint: 'વાળંદની ઉપલબ્ધતા સંભાળો. ફરજ બંધ કરતાં પહેલાં ચાલુ કામ પૂરું કરવું જરૂરી છે.',
-  invalidServiceName: 'માન્ય સેવાનું નામ દાખલ કરો.', invalidServicePrice: 'રૂપિયામાં માન્ય કિંમત દાખલ કરો.', invalidServiceDuration: 'સમયગાળો ૫ થી ૨૪૦ મિનિટ વચ્ચે હોવો જોઈએ.',
+  invalidServiceName: 'નિયંત્રણ અક્ષરો વિના ૨–૮૦ અક્ષરો વાપરો.', invalidServicePrice: 'વધુમાં વધુ બે દશાંશ અંકો સાથે ₹૦–૧,૦૦,૦૦૦ દાખલ કરો.', invalidServiceDuration: '૧ થી ૪૮૦ મિનિટ વચ્ચેનો પૂર્ણાંક દાખલ કરો.', serviceDurationHint: '૧–૪૮૦ મિનિટ',
 }

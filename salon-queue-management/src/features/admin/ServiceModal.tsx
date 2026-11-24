@@ -7,11 +7,13 @@ import { Modal } from '../../components/ui/Modal'
 export function ServiceModal({
   service,
   busy,
+  disabled = false,
   onSave,
   onClose,
 }: {
   service: OwnerService | null
   busy: boolean
+  disabled?: boolean
   onSave: (payload: {
     id: string | null
     name_en: string
@@ -35,15 +37,16 @@ export function ServiceModal({
   const parsedPrice = Number(priceInr)
   const parsedDuration = Number(duration)
 
-  const validNameEn = nameEn.trim().length > 0
-  const validNameGu = nameGu.trim().length > 0
-  const validPrice = Number.isFinite(parsedPrice) && parsedPrice >= 0
-  const validDuration = Number.isInteger(parsedDuration) && parsedDuration >= 5 && parsedDuration <= 240
+  const validName = (name: string) => Array.from(name.trim()).length >= 2 && Array.from(name.trim()).length <= 80 && !/\p{Cc}/u.test(name)
+  const validNameEn = validName(nameEn)
+  const validNameGu = validName(nameGu)
+  const validPrice = /^\d+(?:\.\d{1,2})?$/.test(priceInr.trim()) && parsedPrice >= 0 && parsedPrice <= 100000
+  const validDuration = /^\d+$/.test(duration.trim()) && Number.isInteger(parsedDuration) && parsedDuration >= 1 && parsedDuration <= 480
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setAttempted(true)
-    if (!validNameEn || !validNameGu || !validPrice || !validDuration || busy) return
+    if (!validNameEn || !validNameGu || !validPrice || !validDuration || busy || disabled) return
 
     onSave({
       id: service?.id ?? null,
@@ -83,7 +86,8 @@ export function ServiceModal({
             label={t('price')}
             type="number"
             min="0"
-            step="1"
+            max="100000"
+            step="0.01"
             value={priceInr}
             onChange={e => setPriceInr(e.target.value)}
             disabled={busy}
@@ -93,13 +97,13 @@ export function ServiceModal({
           <Field
             label={t('duration')}
             type="number"
-            min="5"
-            max="240"
-            step="5"
+            min="1"
+            max="480"
+            step="1"
             value={duration}
             onChange={e => setDuration(e.target.value)}
             disabled={busy}
-            hint="5–240 min"
+            hint={t('serviceDurationHint')}
             error={attempted && !validDuration ? t('invalidServiceDuration') : undefined}
           />
         </div>
@@ -113,7 +117,7 @@ export function ServiceModal({
           <Button variant="secondary" disabled={busy} onClick={onClose}>
             {t('dismissDialog')}
           </Button>
-          <Button type="submit" disabled={busy}>
+          <Button type="submit" disabled={busy || disabled}>
             {busy ? t('actionInProgress') : t('saveService')}
           </Button>
         </div>

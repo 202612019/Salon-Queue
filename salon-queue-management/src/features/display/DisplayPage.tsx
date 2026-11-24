@@ -3,12 +3,12 @@ import { Maximize2, Scissors, Sparkles, Volume2, VolumeX } from 'lucide-react'
 import { useLocale } from '../../i18n/context'
 import { formatSalonClock, formatSalonDate } from '../../lib/format'
 import { classes } from '../../lib/classes'
-import { barbers as previewBarbers, waitingEntries as previewWaitingEntries } from '../../services/preview-data'
 import { getPublicSalon } from '../../services/backend'
 import { useSnapshot } from '../../hooks/useSnapshot'
 import { Brand } from '../../components/shared/Brand'
 import { LanguageToggle } from '../../components/shared/LanguageToggle'
-import { OfflineNotice, PreviewBanner } from '../../components/shared/PreviewBanner'
+import { ConnectionNotice } from '../../components/shared/CustomerFeedback'
+import { useSalonClock } from '../../hooks/useSalonClock'
 import { Avatar, Badge, Button, LinkButton } from '../../components/ui'
 
 function playChime() {
@@ -49,7 +49,9 @@ export function DisplayPage() {
   const { t, locale } = useLocale()
   const snapshot = useSnapshot(getPublicSalon, 'public-display')
   const data = snapshot.data
-  const [now, setNow] = useState(() => new Date())
+  const serverNow = useSalonClock(data?.server_time, snapshot.lastUpdated)
+  const [initialNow] = useState(() => Date.now())
+  const now = new Date(serverNow ?? initialNow)
   const [fullscreenError, setFullscreenError] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(false)
   const [newlyCalled, setNewlyCalled] = useState<{ token: string; barberName: string } | null>(null)
@@ -58,11 +60,10 @@ export function DisplayPage() {
   const isFirstLoadRef = useRef(true)
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000)
-    return () => window.clearInterval(timer)
-  }, [])
-
-  useEffect(() => {
+    if (snapshot.connection !== 'live') {
+      isFirstLoadRef.current = true
+      return
+    }
     if (!data?.barbers) return
     if (isFirstLoadRef.current) {
       isFirstLoadRef.current = false
@@ -94,12 +95,16 @@ export function DisplayPage() {
     if (detectedNew) {
       setNewlyCalled(detectedNew)
       if (soundEnabled) playChime()
-      const timer = window.setTimeout(() => {
-        setNewlyCalled(null)
-      }, 5000)
-      return () => window.clearTimeout(timer)
     }
-  }, [data, soundEnabled])
+  }, [data, soundEnabled, snapshot.connection])
+
+  // Polling replaces the snapshot every four seconds. Only a new announcement
+  // should restart its lifetime; snapshot refreshes must not cancel this timer.
+  useEffect(() => {
+    if (!newlyCalled) return
+    const timer = window.setTimeout(() => setNewlyCalled(null), 5000)
+    return () => window.clearTimeout(timer)
+  }, [newlyCalled])
 
   async function enterFullscreen() {
     try {
@@ -119,21 +124,9 @@ export function DisplayPage() {
     on_duty: b.on_duty,
     on_break: b.on_break,
     state: !b.on_duty ? ('offDuty' as const) : b.on_break ? ('onBreak' as const) : b.status === 'called' ? ('called' as const) : b.status === 'in_chair' ? ('inChair' as const) : ('available' as const),
-  })) : previewBarbers.map(b => ({
-    id: b.name,
-    name: b.name,
-    initials: b.initials,
-    token: b.token,
-    status: b.state === 'called' ? ('called' as const) : null,
-    on_duty: true,
-    on_break: b.state === 'onBreak',
-    state: b.state,
-  }))
+  })) : []
 
-  const displayNext = data ? data.next_tokens.slice(0, 5) : previewWaitingEntries.slice(0, 5).map((entry, i) => ({
-    token: entry.token,
-    estimate: { minutes: [29, 57, 66, 105, 96][i], state: 'approximate' as const, position: i + 1, position_kind: 'global' as const }
-  }))
+  const displayNext = data?.next_tokens.slice(0, 5) ?? []
 
   return (
     <div className="display-page">
@@ -150,8 +143,8 @@ export function DisplayPage() {
         <LanguageToggle />
       </header>
 
-      <OfflineNotice />
-      {!data && <PreviewBanner compact />}
+      <ConnectionNotice state={snapshot} refresh={snapshot.refresh} />
+      {!data && <p role="status">{t(snapshot.error ? 'backendUnavailable' : 'connectingData')}</p>}
 
       <main id="main-content" tabIndex={-1}>
         {newlyCalled && (
@@ -221,7 +214,7 @@ export function DisplayPage() {
               ))}
             </div>
           ) : (
-            <p className="display-empty-next">{t('emptyQueue')}</p>
+            <p className="display-empty-next">{t(data ? 'emptyQueue' : 'connectingData')}</p>
           )}
         </section>
       </main>
