@@ -1,6 +1,6 @@
 # SalonQ — Flows & Rules
 
-**Stage:** Final acceptance audit: 81 PASS, 0 FAIL, 10 NOT RUN, individually evidenced in `docs/acceptance-evidence.md` (or `acceptance-evidence.md` from this docs directory). Current local checks: 140 frontend tests, 167 isolated SQL assertions including acceptance extensions, 45 database/concurrency checks. Hosted refresh/revocation and production HTTP/CORS retested; full rendered matrix and a fresh hosted React rerun remain incomplete. See `final-verification.md` and `visual-audit.md`. Functional requirements below are unchanged.
+**Stage:** Final acceptance audit: 81 PASS, 0 FAIL, 10 NOT RUN, individually evidenced in `docs/acceptance-evidence.md` (or `acceptance-evidence.md` from this docs directory). Current local checks: 140 frontend tests, 167 isolated SQL assertions including acceptance extensions, 45 database/concurrency checks. Hosted refresh/revocation, 22 hosted React checkpoints and production HTTP/CORS pass; six deployed assets match the published-tree build. The full rendered/device matrix remains incomplete. See `final-verification.md` and `visual-audit.md`. Functional requirements below are unchanged.
 
 ## 1. Main workflows
 **Remote customer:** Home → Join → enter name/phone → select 1–3 services and barber/Any → confirm → receive unique token and private tracking access → watch position and estimated wait → arrival reminder at position 2 → reception calls → assigned barber starts service → barber completes → terminal status.
