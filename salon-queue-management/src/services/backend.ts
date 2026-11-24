@@ -36,8 +36,16 @@ export const getPublicSalon = (signal?: AbortSignal) => customerOperation<Public
 export const getCustomerStatus = (access: { locator: string; capability: string }, signal?: AbortSignal) => customerOperation<CustomerEntry>('status', access, signal)
 export const cancelCustomerEntry = (access: { locator: string; capability: string }) => customerOperation<CustomerEntry>('cancel', access)
 
-export async function staffOperation(action: string, payload: Json = {}) {
-  const { data, error } = await getSupabaseClient().rpc('salonq_staff_command', { action, payload })
-  if (error) throw new BackendError(/^[A-Z_]+$/.test(error.message) ? error.message : 'BACKEND_UNAVAILABLE')
-  return data
+export async function staffOperation<T = Json>(action: string, payload: Json = {}, signal?: AbortSignal): Promise<T> {
+  let result
+  try {
+    result = await getSupabaseClient().rpc('salonq_staff_command', { action, payload }).abortSignal(signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000))
+  } catch { throw new BackendError('NETWORK_UNCERTAIN', action !== 'snapshot') }
+  const { data, error } = result
+  if (error) {
+    const code = result.status === 401 || error.code === 'PGRST301' ? 'AUTH_REQUIRED' : /^[A-Z_]+$/.test(error.message) ? error.message : 'BACKEND_UNAVAILABLE'
+    throw new BackendError(code, action !== 'snapshot' && (result.status >= 500 || result.status === 0))
+  }
+  if (data === null) throw new BackendError('BACKEND_UNAVAILABLE', action !== 'snapshot')
+  return data as T
 }

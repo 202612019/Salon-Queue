@@ -1,4 +1,21 @@
 .container { width: min(100% - 64px, 1184px); margin-inline: auto; }
+.staff-sign-out, .password-toggle { border:0; background:transparent; color:var(--color-foreground-secondary); min-height:44px; padding:8px; }
+.password-field { position:relative; }
+.password-field input { padding-inline-end:52px; }
+.password-toggle { position:absolute; inset-inline-end:6px; top:31px; width:44px; display:grid; place-items:center; }
+.queue-filters { display:grid; grid-template-columns:minmax(0,1fr) minmax(200px,1fr); gap:16px; padding:0 24px 24px; }
+.staff-select-label { display:grid; gap:8px; font-size:0.875rem; color:var(--color-foreground-secondary); }
+.staff-select-label select { width:100%; min-height:48px; padding:10px 12px; color:var(--color-foreground); background:var(--color-background-secondary); border:1px solid var(--color-border-control); border-radius:var(--radius-control); font:inherit; }
+.empty-queue { padding:24px; color:var(--color-foreground-secondary); }
+.operating-note { color:var(--color-foreground-secondary); font-size:0.875rem; margin-bottom:24px; }
+.staff-modal { width:min(calc(100% - 32px),880px); max-height:calc(100vh - 40px); overflow-y:auto; margin:auto; padding:28px; color:var(--color-foreground); background:var(--color-surface); border:1px solid var(--color-border-control); border-radius:var(--radius-card); }
+.staff-modal::backdrop { background:rgb(0 0 0 / 72%); }
+.staff-modal > p, .staff-modal form > *, .staff-modal > .button { margin-top:20px; }
+.walk-in-total { font-variant-numeric:tabular-nums; padding-block:12px; }
+.walk-in-receipt { display:grid; gap:16px; padding-block:24px; }
+.staff-mobile-nav { display:none; }
+@media (max-width:1023px) { .staff-mobile-nav { display:block; margin-bottom:20px; } .staff-mobile-nav .preview-explorer { display:flex; flex-wrap:wrap; gap:8px; } .staff-mobile-nav .eyebrow, .staff-mobile-nav .sidebar-note { display:none; } }
+@media (max-width:767px) { .queue-filters { grid-template-columns:1fr; padding:0 16px 20px; } .header-actions > .staff-sign-out { display:none; } .staff-modal { padding:20px; } }
 /* Phase 3: focused customer refinements, preserving the existing layouts and tokens. */
 .connection-notice { display:flex; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 0; color:var(--color-foreground-secondary); font-size:0.875rem; }
 .connection-notice > span { display:flex; align-items:center; gap:8px; }

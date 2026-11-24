@@ -8,6 +8,7 @@ import { LocaleProvider } from '../i18n/LocaleProvider'
 import { en, gu } from '../i18n/dictionaries'
 import { formatPrice, formatSalonDate, formatSalonClock } from '../lib/format'
 import { publicEnvironment } from '../lib/env'
+vi.mock('../services/staff-auth', async importOriginal => ({ ...await importOriginal<typeof import('../services/staff-auth')>(), observeStaff: (onState: (state: unknown) => void) => { onState({ session: null, profile: null, error: null, checking: false }); return () => {} } }))
 vi.mock('../services/backend', async importOriginal => ({ ...await importOriginal<typeof import('../services/backend')>(), getPublicSalon: vi.fn().mockRejectedValue(new Error('BACKEND_UNAVAILABLE')) }))
 vi.mock('../services/synchronization', () => ({ synchronizeSnapshot: (load: (signal: AbortSignal) => Promise<unknown>, onState: (state: unknown) => void) => {
   let stopped = false
@@ -22,13 +23,13 @@ function openPage(path = '/') {
 describe('frontend route shells', () => {
   it.each([
     ['/', 'Your Time.Your Turn.'], ['/join', en.joinTitle], ['/status/preview', en.statusTitle],
-    ['/reception', en.receptionTitle], ['/barber/ravi', en.barberTitle], ['/display', en.nowServing],
-    ['/admin', en.adminTitle], ['/login', en.loginTitle], ['/unknown-page', en.notFoundTitle],
+    ['/reception', en.loginTitle], ['/barber/ravi', en.loginTitle], ['/display', en.nowServing],
+    ['/admin', en.loginTitle], ['/login', en.loginTitle], ['/unknown-page', en.notFoundTitle],
   ])('renders %s with one main landmark and the appropriate preview boundary', (path, heading) => {
     openPage(path)
     expect(screen.getAllByRole('main')).toHaveLength(1)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(heading)
-    if (!['/', '/join'].includes(path)) expect(screen.getByText(en.previewDetail)).toBeVisible()
+    if (['/status/preview', '/display', '/unknown-page'].includes(path)) expect(screen.getByText(en.previewDetail)).toBeVisible()
     else expect(screen.queryByText(en.previewDetail)).not.toBeInTheDocument()
   })
 
@@ -45,19 +46,18 @@ describe('frontend route shells', () => {
     expect(screen.queryByText('S-014')).not.toBeInTheDocument()
   })
 
-  it('does not accept credentials or report an authenticated session', () => {
+  it('renders the actual staff form without any demo authentication bypass', () => {
     openPage('/login')
-    expect(screen.getByLabelText(en.email)).toBeDisabled()
-    expect(screen.getByLabelText(en.password)).toBeDisabled()
-    expect(screen.getByRole('button', { name: en.signIn })).toBeDisabled()
-    expect(screen.getByText(en.authUnavailable)).toBeVisible()
+    expect(screen.getByLabelText(en.email)).toBeEnabled()
+    expect(screen.getByLabelText(en.password)).toBeEnabled()
+    expect(screen.getByRole('button', { name: en.signIn })).toBeEnabled()
+    expect(screen.getByText(en.secureStaffHint)).toBeVisible()
   })
 
-  it('keeps all queue-mutating actions unavailable on reception preview', () => {
+  it('protects reception data and operations before an authorized sign-in', () => {
     openPage('/reception')
-    const main = screen.getByRole('main')
-    for (const button of within(main).getAllByRole('button')) expect(button).toBeDisabled()
-    expect(screen.getByText(en.staffPreviewHint)).toBeVisible()
+    expect(within(screen.getByRole('main')).getByRole('heading', { name: en.loginTitle })).toBeVisible()
+    expect(screen.queryByText('Kunal')).not.toBeInTheDocument()
   })
 
   it('keeps join form and submission unavailable without a backend', () => {
@@ -121,7 +121,7 @@ describe('language and formatting foundation', () => {
   it('restores Gujarati preference on a nested route', () => {
     localStorage.setItem('salonq.locale', 'gu')
     openPage('/admin')
-    expect(screen.getByRole('heading', { name: gu.adminTitle })).toBeVisible()
+    expect(screen.getByRole('heading', { name: gu.loginTitle })).toBeVisible()
     expect(document.documentElement.lang).toBe('gu')
   })
 

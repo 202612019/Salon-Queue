@@ -19,7 +19,7 @@ export type Database = {
     CompositeTypes: Record<string, never>
   }
 }
-export type StaffProfile = { user_id: string; role: 'owner' | 'receptionist' | 'barber'; barber_id: string | null }
+export type StaffProfile = { user_id: string; role: 'owner' | 'receptionist' | 'barber'; barber_id: string | null; barber_slug?: string | null }
 export type ServiceSelection = { id: string; version: number; price_paise: number; duration_minutes: number }
 export type AdmissionRequest = {
   request_key: string; capability: string; name: string; phone: string
@@ -43,3 +43,7 @@ export type CustomerEntry = {
   assigned_barber: { id: string; name: string } | null
   services: { id: string; name_en: string; name_gu: string; price_paise: number; duration_minutes: number }[]
 }
+export type StaffBarber = { id: string; slug: string; display_name: string; on_duty: boolean; on_break: boolean; version: number }
+export type StaffEntry = CustomerEntry & { entry_id: string }
+export type ReceptionSnapshot = { server_time: string; barbers: StaffBarber[]; entries: StaffEntry[] }
+export type BarberSnapshot = { server_time: string; barber: StaffBarber; current: StaffEntry | null; next: Pick<CustomerEntry, 'token' | 'customer_name' | 'services'> | null }

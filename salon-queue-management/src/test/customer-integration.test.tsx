@@ -11,6 +11,7 @@ import { saveCustomerAccess, createAdmissionIdentity, readCustomerAccess, readPe
 import { normalizeCustomerPhone, validCustomerName } from '../domain/customer'
 
 const api = vi.hoisted(() => ({ public: vi.fn(), status: vi.fn(), admit: vi.fn(), receipt: vi.fn(), cancel: vi.fn(), refresh: new Set<() => Promise<void>>() }))
+vi.mock('../services/staff-auth', async importOriginal => ({ ...await importOriginal<typeof import('../services/staff-auth')>(), observeStaff: (onState: (state: unknown) => void) => { onState({ session: null, profile: null, error: null, checking: false }); return () => {} } }))
 vi.mock('../services/backend', async importOriginal => ({ ...await importOriginal<typeof import('../services/backend')>(), getPublicSalon: api.public, getCustomerStatus: api.status, admitCustomer: api.admit, recoverAdmission: api.receipt, cancelCustomerEntry: api.cancel }))
 vi.mock('../services/synchronization', () => ({ synchronizeSnapshot: (load: (signal: AbortSignal) => Promise<unknown>, onState: (state: unknown) => void) => {
   let stopped = false

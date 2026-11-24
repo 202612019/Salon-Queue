@@ -1,6 +1,8 @@
 import { customerEn, customerGu } from './customer'
+import { staffEn, staffGu } from './staff'
 export const en = {
   ...customerEn,
+  ...staffEn,
   appName: 'SalonQ', fullName: 'SalonQ — Smart Salon Queue Management', tagline: 'Your Time. Your Turn.',
   home: 'Home', join: 'Join queue', myStatus: 'My status', reception: 'Reception', barber: 'Barber workspace', display: 'Waiting area', admin: 'Salon settings', login: 'Staff sign in',
   language: 'Change language', skip: 'Skip to content', menu: 'Open navigation', closeMenu: 'Close navigation',
@@ -47,6 +49,7 @@ export type Locale = 'en' | 'gu'
 
 export const gu: Record<TranslationKey, string> = {
   ...customerGu,
+  ...staffGu,
   appName: 'SalonQ', fullName: 'SalonQ — સ્માર્ટ સલૂન કતાર વ્યવસ્થાપન', tagline: 'તમારો સમય. તમારો વારો.',
   home: 'મુખ્ય પૃષ્ઠ', join: 'કતારમાં જોડાઓ', myStatus: 'મારી સ્થિતિ', reception: 'રિસેપ્શન', barber: 'વાળંદનું કાર્યસ્થળ', display: 'પ્રતીક્ષા વિસ્તાર', admin: 'સલૂન સેટિંગ્સ', login: 'સ્ટાફ સાઇન ઇન',
   language: 'ભાષા બદલો', skip: 'મુખ્ય સામગ્રી પર જાઓ', menu: 'નેવિગેશન ખોલો', closeMenu: 'નેવિગેશન બંધ કરો',

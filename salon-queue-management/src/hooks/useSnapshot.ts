@@ -14,6 +14,9 @@ export function useSnapshot<T>(load: (signal: AbortSignal) => Promise<T>, key: s
       return () => { disposed = true }
     }
   }, [load, key, enabled, revision])
-  const refresh = useCallback(() => setRevision(value => value + 1), [])
+  const refresh = useCallback(() => {
+    setValue(value => ({ ...value, state: { ...value.state, connection: 'connecting' } }))
+    setRevision(value => value + 1)
+  }, [])
   return { ...(value.key === key && enabled ? value.state : initial<T>()), refresh }
 }

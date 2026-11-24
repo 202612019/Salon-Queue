@@ -11,13 +11,15 @@ import { DisplayPage } from '../features/display/DisplayPage'
 import { AdminPage } from '../features/admin/AdminPage'
 import { LoginPage } from '../features/auth/LoginPage'
 import { NotFoundPage } from '../features/errors/NotFoundPage'
+import { StaffProvider } from '../features/auth/StaffProvider'
+import { ProtectedStaff } from '../features/auth/ProtectedStaff'
 
 export function App() {
   const { pathname } = useLocation()
   const { t } = useLocale()
   useEffect(() => { document.title = t('fullName') }, [t])
   useEffect(() => { window.scrollTo(0, 0); document.getElementById('main-content')?.focus({ preventScroll: true }) }, [pathname])
-  return <Routes>
+  return <StaffProvider><Routes>
     <Route element={<CustomerLayout />}>
       <Route index element={<HomePage />} />
       <Route path="join" element={<JoinPage />} />
@@ -25,11 +27,13 @@ export function App() {
       <Route path="login" element={<LoginPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Route>
-    <Route element={<StaffLayout />}>
+    <Route element={<ProtectedStaff roles={['owner', 'receptionist']} />}><Route element={<StaffLayout />}>
       <Route path="reception" element={<ReceptionPage />} />
-      <Route path="barber/:name" element={<BarberPage />} />
+    </Route></Route>
+    <Route path="barber/:name" element={<ProtectedStaff roles={['barber']} linkedBarber />}><Route element={<StaffLayout />}><Route index element={<BarberPage />} /></Route></Route>
+    <Route element={<ProtectedStaff roles={['owner']} />}><Route element={<StaffLayout />}>
       <Route path="admin" element={<AdminPage />} />
-    </Route>
+    </Route></Route>
     <Route path="display" element={<DisplayPage />} />
-  </Routes>
+  </Routes></StaffProvider>
 }
