@@ -1,6 +1,21 @@
 # SalonQ — Screens & Features
 
-**Stage:** Phase 0 approved planning; not implemented. All seven screens below are required. Example names, prices and tokens are fictional. Business rules in `03-flows-rules.md` govern all actions. Only the canonical `salon-queue-management/` documents govern development.
+**Stage:** Phase 1 frontend foundation implemented as clearly labeled, read-only previews. Functional specifications below remain targets for later feature phases. All seven screens remain required. Business rules in `03-flows-rules.md` govern all future operations. Only the canonical `salon-queue-management/` documents govern development.
+
+## Phase 1 desktop design approval and deferred refinements
+
+The user reports manually opening the rendered application at `http://127.0.0.1:5174/`, reviewing the desktop Home, Join Queue and My Status screenshots, and approving their designs as the foundation for further development. This is user-reported manual visual approval, not an agent browser verification. Exact viewport dimensions were not supplied. No approval or visual verification is recorded for Reception, Barber, TV, Owner Settings, login/error pages, mobile/tablet/TV viewport sizes, or Gujarati layouts. Automated component checks do not establish rendered layout quality. No screenshot artifacts are claimed as captured or archived by the agent.
+
+Preserve the existing branding, typography, charcoal/champagne-gold palette, navigation, digital queue pass, reusable components and desktop layouts. Do not redesign the whole application. The following work is recorded for the corresponding feature phase; it is not implemented as part of Phase 1 closure.
+
+| Feature phase | Targeted UI work |
+|---|---|
+| Home | Reduce excessive hero whitespace and bring salon availability and authoritative live queue statistics closer to the top. Consider an optional tasteful, optimized salon photograph only after verifying its license and retaining required attribution. Give barber cards consistent fictional avatars. Add featured services with authoritative catalog prices/durations. Refine the three-step customer journey presentation. |
+| Join Queue | Add a clear three-step progress indicator without replacing the approved desktop layout. Show selected-service count out of three. Preserve service cards and the sticky summary. Connect accessible selection feedback, show barber warnings only when relevant, and optimize the mobile confirmation experience. |
+| My Status | Preserve the digital queue pass. Add an elegant circular approximate-wait visualization that never promises a guaranteed countdown and represents unavailable/overrun states honestly. Refine status progression. Add secure Copy Status Link following the approved capability/fragment contract. Show a prominent gold Called notification with the assigned barber, accessible status announcements and reduced-motion behavior. |
+| All affected features | Maintain EN/GU text and shared tokens; avoid unnecessary dependencies and excessive animation. Keep previews explicitly fictional until real functionality exists. Never fabricate live statistics or use unlicensed imagery. Preserve all business rules, architecture, security controls and remaining visual QA obligations. |
+
+Any photo is optional, not an MVP dependency. Existing initials remain acceptable until avatar refinements are implemented. The current unconditional sample break warning is a known preview limitation to address when Join functionality is connected; it is not a live availability claim. The original 91 numbered acceptance scenarios remain unchecked.
 
 ## SalonQ brand identity
 

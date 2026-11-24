@@ -1,6 +1,6 @@
 # SalonQ — Project Brief & Scope
 
-**Version:** 1.2 | **Stage:** Phase 0 approved planning with enhanced SalonQ UI/UX direction; no application implementation or application tests completed.
+**Version:** 1.3 | **Stage:** Phase 1 frontend foundation implemented; backend functionality remains unimplemented. The user approved the desktop Home, Join Queue and My Status design foundation after manual review at `http://127.0.0.1:5174/`. Other screens, exact viewport sizes and Gujarati layouts are not visually verified. See the application README for automated verification results and `02-screens.md` for deferred targeted refinements.
 
 **Canonical project:** `D:/My Folder/Salon Queue/Salon-Queue/salon-queue-management`, inside the existing `Salon-Queue` Git checkout. These four documents are the sole implementation source of truth. The unchanged pre-Phase-0 reviewed set is archived outside Git at `../../planning-backups/2026-11-24-phase0-reviewed/`; archived copies are not active requirements. **College deadline:** 24 November 2026, 11:59 PM IST. Deliver the functional, secure MVP through small tasks; avoid unnecessary research and dependencies.
 
@@ -84,7 +84,7 @@ Customers read/cancel only their own capability-authorized entry, with cancellat
 
 ## Planned application structure
 
-This is a plan only; Phase 0 creates no application directories or source files.
+Phase 1 implements the frontend directories below, route shells, shared components, local fonts and tests. Supabase backend directories, migrations and live operations remain future work. Preview fixtures are fictional, and staff preview pages grant no authenticated access. No queue operation can succeed in this phase.
 
 ```text
 salon-queue-management/

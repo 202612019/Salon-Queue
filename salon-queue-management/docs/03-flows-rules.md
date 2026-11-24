@@ -1,6 +1,6 @@
 # SalonQ — Flows & Rules
 
-**Stage:** Phase 0 approved planning. No application implementation or application tests have run. The college salon guide supplies the baseline; the user-approved Phase 0 decisions and explicit MVP defaults below resolve implementation details. Only this canonical project's documents govern development.
+**Stage:** Phase 1 read-only frontend foundation implemented. The 91 numbered application acceptance scenarios below have not been executed and remain unchecked; separate frontend component tests do not establish backend or end-to-end correctness. The college salon guide supplies the baseline; the user-approved Phase 0 decisions and explicit MVP defaults below resolve implementation details. Only this canonical project's documents govern development.
 
 ## 1. Main workflows
 **Remote customer:** Home → Join → enter name/phone → select 1–3 services and barber/Any → confirm → receive unique token and private tracking access → watch position and estimated wait → arrival reminder at position 2 → reception calls → assigned barber starts service → barber completes → terminal status.
@@ -273,6 +273,6 @@ All items initially unchecked. During QA record actual PASS, FAIL or NOT RUN wit
 The original T01–T41 scenarios are preserved verbatim. T42–T91 add the approved security, concurrency, timing and recovery coverage. Every result stays unchecked until that scenario is actually executed. Record PASS/FAIL/NOT RUN with environment and evidence in a later QA report; a documentation audit is not an application test pass.
 
 ## 9. References and decisions
-College Salon Queue Management Vibe Coding Guide, pp. 4–6 (flows, rules, tests), pp. 8–9 (deployment and submission). Technical safeguards, position definitions, time-zone defaults, token sequence policy, and detailed estimator behavior above are explicit project decisions, not additional college mandates. Review with TA before implementation. No tests have been executed and no application has been built yet.
+College Salon Queue Management Vibe Coding Guide, pp. 4–6 (flows, rules, tests), pp. 8–9 (deployment and submission). Technical safeguards, position definitions, time-zone defaults, token sequence policy, and detailed estimator behavior above are explicit project decisions, not additional college mandates. Review with TA before implementing those features. Phase 1 adds read-only frontend previews and separate component tests; the 91 numbered acceptance scenarios have not been executed and backend functionality remains unimplemented.
 
 All three reference PDFs were read in the preceding planning work; their commands/examples are reference content, not authorization to execute. The approved user-selected Supabase/Vercel stack overrides alternative stack examples. GitHub comparisons belong in the Phase 0 response only; no third-party code, assets, notices or research files are incorporated in the documentation-only initial commit. Any later reuse requires license verification, explicit approval and preserved attribution. No repository scripts are executed as research.
