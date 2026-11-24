@@ -63,6 +63,6 @@ function PrivateStatusPage({ id }: { id: string }) {
         </div>
       </div><div className="cancel-area">{entry.status === 'waiting' ? <Button variant="quiet" disabled={cancelling || state.connection !== 'live'} onClick={() => setDialog(true)}>{t('cancel')}</Button> : <p>{t('cancelOnlyWaiting')}</p>}<LinkButton to="/" variant="quiet">{t('backHome')}</LinkButton></div>
     </>}
-    {dialog && <ConfirmDialog title={t('cancelTitle')} description={t('cancelBody')} confirm={t(cancelling ? 'cancelling' : 'confirmCancel')} dismiss={t('keepPlace')} busy={cancelling} onConfirm={() => void cancel()} onDismiss={() => setDialog(false)} />}
+    {dialog && <ConfirmDialog title={t('cancelTitle')} description={t('cancelBody')} confirm={t(cancelling ? 'cancelling' : 'confirmCancel')} dismiss={t('keepPlace')} busy={cancelling} confirmDisabled={state.connection !== 'live'} onConfirm={() => void cancel()} onDismiss={() => setDialog(false)} />}
   </>
 }

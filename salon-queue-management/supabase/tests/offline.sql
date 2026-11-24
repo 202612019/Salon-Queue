@@ -127,3 +127,23 @@ select public.test_assert((public.salonq_staff_command('snapshot')->'next'->>'to
 reset role;
 select public.test_assert(not (public.salonq_gateway('public_snapshot')::text like '%locator%'),'public tokens do not expose status locators');
 select public.test_assert((select count(*)=3 and bool_and(barber->'estimate' is not null) from jsonb_array_elements(public.salonq_gateway('public_snapshot')->'barbers') barber),'public barber estimates use the existing authoritative estimator');
+-- A retry receipt must never restore permissions removed after the original action.
+update salon_private.staff_profiles set role='barber',barber_id='20000000-0000-4000-8000-000000000003' where user_id='30000000-0000-4000-8000-000000000002';
+set role authenticated;
+select set_config('request.jwt.claim.sub','30000000-0000-4000-8000-000000000002',false);
+select public.test_fails('select public.salonq_staff_command(''call_next'',jsonb_build_object(''request_key'',repeat(''b'',64),''barber_id'',''20000000-0000-4000-8000-000000000001''))','FORBIDDEN');
+reset role;
+update salon_private.staff_profiles set role='receptionist',barber_id=null where user_id='30000000-0000-4000-8000-000000000002';
+update salon_private.staff_profiles set role='receptionist' where user_id='30000000-0000-4000-8000-000000000001';
+set role authenticated;
+select set_config('request.jwt.claim.sub','30000000-0000-4000-8000-000000000001',false);
+select public.test_fails('select public.salonq_staff_command(''set_duty'',jsonb_build_object(''request_key'',repeat(''4'',64),''barber_id'',''20000000-0000-4000-8000-000000000003'',''version'',1,''on_duty'',true,''on_break'',true))','FORBIDDEN');
+reset role;
+update salon_private.staff_profiles set role='owner' where user_id='30000000-0000-4000-8000-000000000001';
+update salon_private.staff_profiles set barber_id='20000000-0000-4000-8000-000000000002' where user_id='30000000-0000-4000-8000-000000000003';
+set role authenticated;
+select set_config('request.jwt.claim.sub','30000000-0000-4000-8000-000000000003',false);
+-- Read the saved result under test-admin role before checking its role-restricted replay.
+reset role;
+select public.test_fails(format('select public.salonq_staff_command(''start'',%L::jsonb)',jsonb_build_object('request_key',repeat('e',64),'entry_id',result->>'entry_id','version',2)),'FORBIDDEN') from public.test_results where name='ravi';
+update salon_private.staff_profiles set barber_id='20000000-0000-4000-8000-000000000001' where user_id='30000000-0000-4000-8000-000000000003';

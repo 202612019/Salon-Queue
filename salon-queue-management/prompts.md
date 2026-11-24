@@ -784,3 +784,471 @@ Additional user instruction:
 Continuation message:
 
 > continue
+
+## Phase 4 authorization — 24 November 2026
+
+> # Phase 4 — Functional Staff Authentication, Reception Dashboard and Barber Workspace
+>
+> Phase 3 is approved and complete.
+>
+> Latest commit: f415d36.
+>
+> The customer-facing Home, Join Queue and private My Status screens are connected to hosted Supabase.
+>
+> Reported verification:
+>
+> - Automated tests: 72 PASS
+> - SQL assertions: 64 PASS
+> - Local database checks: 37 PASS
+> - Hosted React checkpoints: 14 PASS
+> - Build, lint and Edge type-check: PASS
+>
+> You are authorized to begin Phase 4 immediately.
+>
+> Act as a Senior Full-Stack Developer, Supabase Integration Specialist, UI/UX Engineer, Application Security Engineer and QA Engineer.
+>
+> Our college submission deadline is 24 November 2026 at 11:59 PM IST. Prioritize completing working functionality efficiently.
+>
+> ## 1. Review the existing implementation
+>
+> Read:
+>
+> - AGENTS.md
+> - docs/01-brief.md
+> - docs/02-screens.md
+> - docs/03-flows-rules.md
+> - docs/phase-3-verification.md
+> - supabase/README.md
+>
+> Inspect the existing authentication infrastructure, service adapters, realtime hooks, staff screen components and transactional backend operations.
+>
+> Reuse the existing implementation.
+>
+> Do not regenerate the frontend, repeat database setup, recreate staff accounts, or unnecessarily rewrite the backend.
+>
+> Preserve the approved SalonQ branding, charcoal/champagne-gold design, typography and reusable components.
+>
+> ## 2. Implementation scope
+>
+> Activate:
+>
+> 1. Staff Login — /login
+> 2. Reception Dashboard — /reception
+> 3. Barber View — /barber/:name
+>
+> Also update shared authentication, route protection, navigation and realtime infrastructure where necessary.
+>
+> The existing customer-facing functionality must remain operational.
+>
+> Do not implement the complete Owner Settings or Waiting Area TV functionality during this phase.
+>
+> ## 3. Staff authentication
+>
+> Connect the existing premium staff login page to Supabase Auth.
+>
+> Implement:
+>
+> - Email and password inputs.
+> - Input validation.
+> - Password visibility toggle.
+> - Sign-in loading state.
+> - Friendly authentication errors.
+> - Session restoration after refresh.
+> - Sign-out.
+> - Session expiry handling.
+> - Protected staff routes.
+> - Role-based navigation.
+> - Unauthorized-access handling.
+>
+> Retrieve roles and barber associations from the authoritative protected staff profile records.
+>
+> Do not trust user-editable metadata, URL parameters or localStorage values for authorization.
+>
+> Use the five previously provisioned demonstration accounts.
+>
+> Do not create duplicate accounts.
+>
+> ### Role-based navigation
+>
+> - Receptionist: navigate to /reception after successful login.
+> - Barber: navigate to their authorized /barber/:name route.
+> - Owner: navigate to /admin, clearly indicating any functionality still pending Phase 5.
+>
+> Enforce the approved role-permission matrix from the documentation.
+>
+> A barber must not access another barber's private workspace by changing the URL.
+>
+> An authenticated user must not gain additional privileges merely by navigating to another route.
+>
+> Do not implement public staff registration or insecure demo-login bypasses.
+>
+> ## 4. Reception Dashboard
+>
+> Replace all fictional reception fixtures with authorized live backend snapshots.
+>
+> Preserve the existing premium dashboard layout.
+>
+> Implement:
+>
+> - Salon operating and online-admission status.
+> - Live connection status.
+> - Number of waiting customers.
+> - Number of active assignments.
+> - Number of available barbers.
+> - Barber availability cards.
+> - Current customer assignments.
+> - Current queue status.
+> - Elapsed service time.
+> - Approximate remaining service duration.
+> - Ordered waiting queue.
+> - Customer token, name and selected services.
+> - Preferred barber.
+> - Waiting duration.
+> - Highlight customers waiting longer than 60 minutes.
+> - Contextual action buttons.
+> - Loading, empty, disconnected and error states.
+>
+> Provide useful search and filters if they can be implemented without delaying core functionality.
+>
+> Do not permanently display hard-coded operational statistics.
+>
+> ## 5. Call Next functionality
+>
+> Connect each barber's Call Next button to the existing transactional backend operation.
+>
+> Enforce:
+>
+> - Correct staff authorization.
+> - Barber must be on duty.
+> - Barber must not be on break.
+> - Barber must not have an active assignment.
+> - Earliest eligible waiting customer is selected.
+> - Explicit barber preferences are respected.
+> - Any Barber customers can be assigned to eligible barbers.
+> - One active assignment per barber.
+> - One assignment per queue entry.
+>
+> After successful calling:
+>
+> - Update the Reception Dashboard.
+> - Update the assigned barber's workspace.
+> - Update the customer's private My Status page.
+> - Show the appropriate Called notification.
+> - Refetch authoritative data.
+> - Display success feedback.
+>
+> Prevent duplicate requests and handle simultaneous Call Next operations safely.
+>
+> If no eligible customer exists, provide a clear, friendly message.
+>
+> Never perform assignment solely in client-side React state.
+>
+> ## 6. Add Walk-in functionality
+>
+> Connect the Add Walk-in action to the existing trusted walk-in admission operation.
+>
+> Create an accessible dialog or form using the current design system.
+>
+> Include:
+>
+> - Customer name.
+> - Indian mobile number.
+> - One to three enabled services.
+> - Preferred barber or Any Barber.
+> - Actual service prices.
+> - Total duration.
+> - Total price.
+> - Validation and confirmation.
+>
+> Walk-ins must join the same queue as remote customers.
+>
+> Respect duplicate-phone, service-selection, operating-hour and barber-duty rules.
+>
+> Walk-ins may join during the final thirty minutes of salon operating hours, when online admission is closed.
+>
+> After successful registration, display the generated token.
+>
+> Provide the private tracking link to the intended customer through the approved secure mechanism, if available in the existing backend contract.
+>
+> Do not expose private tracking capabilities in the general waiting queue.
+>
+> ## 7. Cancellation and No-show
+>
+> Connect the existing cancellation and No-show actions.
+>
+> ### Cancellation
+>
+> - Allowed only while Waiting.
+> - Require confirmation.
+> - Use the trusted backend operation.
+> - Handle cancellation-versus-calling races.
+>
+> ### No-show
+>
+> - Allowed only while Called.
+> - Enforce the ten-minute threshold using authoritative server timestamps.
+> - Clearly explain when the action becomes available.
+> - Require confirmation.
+> - Update all relevant views after success.
+>
+> Returning No-show customers must be registered as new entries at the end of the queue with new tokens.
+>
+> Do not restore their previous queue positions.
+>
+> ## 8. Barber workspace
+>
+> Replace fictional Barber View data with the authenticated barber's authorized live snapshot.
+>
+> Implement:
+>
+> - Barber identity.
+> - Duty and availability status.
+> - Current assigned customer.
+> - Customer token.
+> - Selected service snapshots.
+> - Total expected service duration.
+> - Current queue status.
+> - Persisted service timer.
+> - Start Service button.
+> - Complete Service button.
+> - Next eligible waiting customer preview.
+> - Available and On Break controls.
+> - Loading, empty, disconnected and error states.
+>
+> Maintain a focused mobile-first interface with large, accessible touch targets.
+>
+> Do not expose unnecessary customer information.
+>
+> ## 9. Start Service
+>
+> Connect Start Service to the existing trusted backend operation.
+>
+> Requirements:
+>
+> - Only the authorized assigned barber can start the service.
+> - Current customer must be in Called status.
+> - Transition from Called to In Chair.
+> - Record the server-generated service start timestamp.
+> - Update reception and customer tracking automatically.
+> - Start the displayed elapsed timer from the persisted timestamp.
+>
+> Prevent invalid transitions and repeated submissions.
+>
+> ## 10. Complete Service
+>
+> Connect Complete Service to the existing trusted backend operation.
+>
+> Requirements:
+>
+> - Only authorized operations may complete the assigned service.
+> - Current status must be In Chair.
+> - Transition to Done.
+> - Persist completion timestamp.
+> - Release barber capacity.
+> - Update customer tracking.
+> - Update reception.
+> - Refresh the next eligible customer preview.
+> - Show clear completion feedback.
+>
+> Do not automatically call the next customer unless explicitly permitted by the existing approved business rules.
+>
+> ## 11. Service timer
+>
+> Display elapsed service time using persisted server timestamps.
+>
+> The timer must:
+>
+> - Survive refresh.
+> - Restore after reconnecting.
+> - Avoid reliance on an independently stored client-side start time.
+> - Use tabular numerals.
+> - Distinguish expected duration from actual elapsed time.
+> - Clearly indicate service overruns.
+>
+> Do not show misleading guaranteed completion times.
+>
+> ## 12. Barber break management
+>
+> Implement functional Available and On Break controls.
+>
+> Enforce:
+>
+> - Busy barbers cannot begin a break.
+> - Barbers on break cannot receive new assignments.
+> - Only authorized users can change the relevant barber's availability.
+> - Returning from break restores eligible availability.
+> - Existing customer estimates and availability information refresh appropriately.
+>
+> Keep Off Duty management within the approved owner permissions.
+>
+> ## 13. Realtime synchronization
+>
+> Reuse the sanitized change-signal infrastructure.
+>
+> Ensure that changes automatically propagate between:
+>
+> - Customer Home.
+> - Customer My Status.
+> - Reception Dashboard.
+> - Barber View.
+>
+> Use authoritative snapshot refetching after change signals and successful mutations.
+>
+> Handle subscription readiness, connection loss, reconnection, foregrounding, session changes and cleanup.
+>
+> Target cross-screen synchronization within five seconds under normal connected conditions.
+>
+> Display accurate connection indicators.
+>
+> Do not expose raw private customer records through public realtime subscriptions.
+>
+> ## 14. Premium UI and translations
+>
+> Preserve existing SalonQ screen layouts.
+>
+> Improve only where necessary for functionality and usability.
+>
+> Reception should provide:
+>
+> - Clear operational statistics.
+> - Visually distinct barber states.
+> - Readable queue information.
+> - Contextual action buttons.
+> - Professional confirmation dialogs.
+> - Clear success and error feedback.
+>
+> Barber View should provide:
+>
+> - A prominent customer token.
+> - Large service timer.
+> - Clear Start and Complete actions.
+> - Minimal visual distractions.
+>
+> Translate all new labels, validation messages, status indicators and backend errors into English and Gujarati.
+>
+> Maintain centralized translation dictionaries, accessibility, keyboard navigation and responsive behavior.
+>
+> Avoid unnecessary cosmetic redesign.
+>
+> ## 15. Security requirements
+>
+> Preserve existing RLS, RPC permissions, Edge Function authorization and private tracking security.
+>
+> Never:
+>
+> - Disable RLS.
+> - Expose privileged credentials.
+> - Allow staff to modify their own role.
+> - Trust client-side authorization alone.
+> - Expose private tracking capabilities in dashboards.
+> - Permit unauthorized barber access.
+> - Introduce direct database mutations that bypass the queue engine.
+> - Fabricate successful operations.
+>
+> Keep all existing demo passwords and private test artifacts outside Git.
+>
+> Use fictional customers and role-limited demo accounts for hosted verification.
+>
+> ## 16. End-to-end testing
+>
+> Actually exercise this primary workflow:
+>
+> 1. Customer joins using the customer-facing form.
+> 2. A real unique token is generated.
+> 3. Customer appears in the Reception Dashboard.
+> 4. Receptionist clicks Call Next for an eligible barber.
+> 5. Customer My Status changes to Called.
+> 6. The assigned barber sees the customer.
+> 7. Barber clicks Start Service.
+> 8. Customer My Status changes to In Chair.
+> 9. Reception reflects the service in progress.
+> 10. Barber clicks Complete Service.
+> 11. Customer My Status changes to Done.
+> 12. Barber becomes available again.
+>
+> Verify additional scenarios:
+>
+> - Correct staff authentication and logout.
+> - Session restoration and expiry.
+> - Unauthorized route access.
+> - Barber role isolation.
+> - Walk-in registration.
+> - Duplicate admission.
+> - Explicit barber preference enforcement.
+> - Simultaneous Call Next requests.
+> - Cancellation races.
+> - Invalid status transitions.
+> - No-show before and after the allowed threshold.
+> - Barber break restrictions.
+> - Timer persistence.
+> - Realtime updates and reconnection.
+> - English/Gujarati behavior.
+> - Responsive layouts where authorized browser tools are available.
+>
+> Use existing isolated database tests for timing boundaries. Do not weaken hosted business rules to make tests pass.
+>
+> Verify existing customer functionality has not regressed.
+>
+> Run:
+>
+> - npm run build
+> - npm run lint
+> - npm run test
+> - Relevant database and hosted integration tests
+>
+> Report actual PASS, FAIL or NOT RUN results.
+>
+> Update the 91 documented acceptance scenarios only when corresponding behavior has genuinely been verified.
+>
+> If rendered browser verification remains unavailable, provide concise manual testing instructions. Do not spend excessive time repeatedly attempting blocked browser workflows.
+>
+> ## 17. Git and documentation
+>
+> Preserve existing commits and working functionality.
+>
+> Record the actual prompt in prompts.md where available.
+>
+> Create:
+>
+> docs/phase-4-verification.md
+>
+> Include test evidence, local URLs, remaining limitations and manual testing instructions.
+>
+> Commit the completed implementation using:
+>
+> feat: connect staff authentication reception and barber operations
+>
+> Do not commit secrets, passwords, private capabilities or generated artifacts.
+>
+> Do not push or deploy during this phase.
+>
+> ## 18. Final report
+>
+> Provide:
+>
+> 1. Implemented staff functionality.
+> 2. Connected backend operations.
+> 3. Authentication and authorization verification.
+> 4. End-to-end queue lifecycle results.
+> 5. Realtime synchronization results.
+> 6. Automated test results.
+> 7. Updated acceptance scenario results.
+> 8. Build and lint results.
+> 9. Exact local testing URLs.
+> 10. Demo account access instructions without displaying passwords.
+> 11. Changed files.
+> 12. Git commit hash.
+> 13. Remaining limitations.
+> 14. Readiness for Phase 5.
+>
+> IMPORTANT:
+>
+> Start actual implementation immediately.
+>
+> Do not perform another planning-only phase.
+>
+> Prioritize a working customer-to-reception-to-barber lifecycle.
+>
+> Reuse existing backend functions and preserve the approved premium frontend.
+>
+> Complete Phase 4 and stop before implementing the Waiting Area TV and Owner Settings functionality.

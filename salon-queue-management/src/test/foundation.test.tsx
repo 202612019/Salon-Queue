@@ -132,8 +132,8 @@ describe('language and formatting foundation', () => {
     expect(formatSalonClock(date, 'en')).toMatch(/12:30/)
   })
 
-  it('records the authorized customer integration phase without enabling staff screens', () => {
+  it('records the authorized staff integration phase with public-only configuration', () => {
     expect(publicEnvironment.backendOperationsEnabled).toBe(true)
-    expect(publicEnvironment.phase).toBe('customer-integration')
+    expect(publicEnvironment.phase).toBe('staff-integration')
   })
 })

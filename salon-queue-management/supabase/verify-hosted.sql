@@ -18,6 +18,8 @@ select
   has_function_privilege('service_role','public.salonq_gateway(text,jsonb,uuid)','execute') as gateway_backend_allowed,
   has_function_privilege('authenticated','public.salonq_staff_command(text,jsonb)','execute')
     and not has_function_privilege('anon','public.salonq_staff_command(text,jsonb)','execute') as staff_execution_permissions,
+  not has_function_privilege('anon','salon_private.salonq_staff_command(text,jsonb)','execute')
+    and not has_function_privilege('authenticated','salon_private.salonq_staff_command(text,jsonb)','execute') as transaction_implementation_private,
   exists(select 1 from pg_indexes where schemaname='salon_private' and indexname='one_active_phone')
     and exists(select 1 from pg_indexes where schemaname='salon_private' and indexname='one_assignment_per_barber') as uniqueness_indexes_present,
   (select bool_and(indisunique and indpred is not null) from pg_index i join pg_class c on c.oid=i.indexrelid

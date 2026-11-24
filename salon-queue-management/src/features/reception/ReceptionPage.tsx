@@ -46,6 +46,6 @@ export function ReceptionPage() {
       })}</section>}
     </>}
     {walkIn && salon.data && <WalkInForm salon={salon.data} fresh={fresh && salon.connection === 'live' && !command.pending && !command.busy} refresh={() => { state.refresh(); salon.refresh() }} onClose={() => setWalkIn(false)} />}
-    {confirm && <ConfirmDialog title={t(confirm.action === 'cancel' ? 'cancelStaffTitle' : 'noShowTitle')} description={t(confirm.action === 'cancel' ? 'cancelStaffBody' : 'noShowBody')} confirm={t(command.busy ? 'actionInProgress' : 'confirmAction')} dismiss={t('dismissDialog')} busy={command.busy} onConfirm={() => { void command.run(confirm.action, { entry_id: confirm.entry.entry_id, version: confirm.entry.version }).finally(() => setConfirm(null)) }} onDismiss={() => setConfirm(null)} />}
+    {confirm && <ConfirmDialog title={t(confirm.action === 'cancel' ? 'cancelStaffTitle' : 'noShowTitle')} description={t(confirm.action === 'cancel' ? 'cancelStaffBody' : 'noShowBody')} confirm={t(command.busy ? 'actionInProgress' : 'confirmAction')} dismiss={t('dismissDialog')} busy={command.busy} confirmDisabled={blocked} onConfirm={() => { void command.run(confirm.action, { entry_id: confirm.entry.entry_id, version: confirm.entry.version }).finally(() => setConfirm(null)) }} onDismiss={() => setConfirm(null)} />}
   </>
 }

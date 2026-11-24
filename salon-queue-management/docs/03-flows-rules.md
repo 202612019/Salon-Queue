@@ -186,16 +186,16 @@ All items initially unchecked. During QA record actual PASS, FAIL or NOT RUN wit
 | T06 | Same phone joins twice | One active entry; no private data leak | [x] PASS — actual hosted rejection + component message, Phase 3 |
 | T07 | Concurrent joins/repeated confirm | Unique tokens; no duplicate entry for same phone | [ ] |
 | T08 | Refresh active status | Same entry and current state | [ ] |
-| T09 | Add walk-in after remote join | Walk-in goes to tail of same queue | [ ] |
-| T10 | Amit calls with Ravi-only entry first | Earliest Amit/Any entry selected | [ ] |
+| T09 | Add walk-in after remote join | Walk-in goes to tail of same queue | [x] PASS — hosted React/jsdom walk-in tail, Phase 4 |
+| T10 | Amit calls with Ravi-only entry first | Earliest Amit/Any entry selected | [x] PASS — hosted React/jsdom eligible Amit selection, Phase 4 |
 | T11 | No eligible entry | No assignment; clear feedback | [ ] |
 | T12 | Concurrent calls for same barber | Only one active assignment | [ ] |
 | T13 | Two barbers call one Any entry | Entry assigned at most once | [ ] |
-| T14 | Waiting → Called → In Chair → Done | All allowed transitions persist | [ ] |
+| T14 | Waiting → Called → In Chair → Done | All allowed transitions persist | [x] PASS — hosted React/jsdom persisted staff lifecycle, Phase 4 |
 | T15 | Attempt invalid/backward transition | Backend rejects | [ ] |
 | T16 | Cancel while Waiting | Terminal; queue recalculates | [x] PASS — hosted React/jsdom cancellation and public zero-Waiting read, Phase 3 |
 | T17 | Cancel after Called | Rejected | [x] PASS — hosted request rejected; mounted Called screen has no cancel action, Phase 3 |
-| T18 | No-show before ten minutes | Rejected | [ ] |
+| T18 | No-show before ten minutes | Rejected | [x] PASS — hosted React/jsdom early No-show disabled and server rejected, Phase 4 |
 | T19 | No-show at/after ten minutes | Terminal; barber released | [ ] |
 | T20 | Re-add no-show | New token at end | [ ] |
 | T21 | Barber on break | No assignment; preference warning | [ ] |
@@ -270,9 +270,9 @@ All items initially unchecked. During QA record actual PASS, FAIL or NOT RUN wit
 | T90 | Catalog form has missing GU name, fractional/zero duration or invalid price | Shared exact bounds enforced by backend; valid zero price remains permitted | [ ] |
 | T91 | Public join/status attempts exceed configured rate limits | Server returns bounded generic rate-limit response; no extra entries or data leakage | [ ] |
 
-The scenario wording for T01–T91 is preserved. Only the five explicitly evidenced results above are marked passed; their environment is hosted React/jsdom, not a real-browser visual review. All other unchecked rows mean NOT RUN as complete scenarios, even when isolated checks cover a rule. Phase 2 local tests, Phase 2.5 backend checks and Phase 3 component/hosted integration evidence are separate. See `phase-3-verification.md` for exact scope and remaining browser/cross-device, staff, hosted-race and timing work.
+The scenario wording for T01–T91 is preserved. The nine explicitly evidenced results above (T01, T04, T06, T09, T10, T14, T16, T17, T18) are marked passed; their environment is hosted React/jsdom, not a real-browser visual review. All other unchecked rows mean NOT RUN as complete scenarios, even when isolated checks cover a rule. Phase 2 local tests, Phase 2.5 backend checks, Phase 3 customer evidence and Phase 4 staff integration evidence are separate. See `phase-4-verification.md` for exact scope and remaining browser/cross-device, hosted-race and timing work.
 
 ## 9. References and decisions
-College Salon Queue Management Vibe Coding Guide, pp. 4–6 (flows, rules, tests), pp. 8–9 (deployment and submission). Technical safeguards, position definitions, time-zone defaults, token sequence policy, and detailed estimator behavior above are explicit project decisions. Phase 1 adds previews, Phase 2 the backend, Phase 2.5 hosted activation and Phase 3 the three customer screens. Staff integration, browser/cross-device review and remaining numbered scenarios are pending.
+College Salon Queue Management Vibe Coding Guide, pp. 4–6 (flows, rules, tests), pp. 8–9 (deployment and submission). Technical safeguards, position definitions, time-zone defaults, token sequence policy, and detailed estimator behavior above are explicit project decisions. Phase 1 adds previews, Phase 2 the backend, Phase 2.5 hosted activation, Phase 3 the three customer screens and Phase 4 the staff login, reception and barber views. Owner settings, TV screen, browser/cross-device review and remaining numbered scenarios are pending.
 
 All three reference PDFs were read in the preceding planning work; their commands/examples are reference content, not authorization to execute. The approved user-selected Supabase/Vercel stack overrides alternative stack examples. GitHub comparisons belong in the Phase 0 response only; no third-party code, assets, notices or research files are incorporated in the documentation-only initial commit. Any later reuse requires license verification, explicit approval and preserved attribution. No repository scripts are executed as research.
