@@ -1252,3 +1252,267 @@ Continuation message:
 > Reuse existing backend functions and preserve the approved premium frontend.
 >
 > Complete Phase 4 and stop before implementing the Waiting Area TV and Owner Settings functionality.
+
+## Phase 5 Waiting Area TV and Owner Settings implementation (Google Antigravity)
+
+> # Phase 5 — Functional Waiting Area TV and Owner Settings
+>
+> Phase 4 is approved, subject to the verification requirements below.
+>
+> Latest implementation commit: 39de923.
+>
+> We are developing SalonQ — Smart Salon Queue Management for a college Vibe Coding assignment.
+>
+> The submission deadline is today, 24 November 2026, at 11:59 PM IST.
+>
+> Act as a Senior Full-Stack Developer, Supabase Integration Specialist, UI/UX Engineer, Application Security Engineer and QA Engineer.
+>
+> Start implementation immediately. Do not produce another lengthy planning-only response.
+>
+> ## 1. Project continuity
+>
+> Read:
+> - AGENTS.md
+> - docs/01-brief.md
+> - docs/02-screens.md
+> - docs/03-flows-rules.md
+> - docs/phase-3-verification.md
+> - docs/phase-4-verification.md
+> - supabase/README.md
+>
+> Use the existing canonical project directory:
+> Salon-Queue/salon-queue-management/
+>
+> Inspect the existing Git status, backend functions, service adapters, realtime infrastructure, authentication implementation and screen components.
+>
+> Preserve all existing working functionality and Git history.
+>
+> The project was previously developed using Codex and is now being continued using Google Antigravity.
+>
+> Follow the existing AGENTS.md instructions. Do not create a separate application or replace the approved architecture.
+>
+> ## 2. Resolve Phase 4 verification issues
+>
+> Before implementing new functionality:
+> - Verify that migration 20261124000400_staff_retry_authorization.sql has been applied to hosted Supabase.
+> - If it has not been applied, follow the existing authorized migration procedure.
+> - Verify the current staff retry authorization security controls.
+> - Confirm the canonical TV route is /display, as required by the college guide.
+> - If /tv exists, it may remain an alias redirecting to /display.
+> - Do not introduce duplicate TV implementations.
+> - Preserve the nine verified acceptance scenarios.
+> - Do not mark the remaining 82 scenarios as passed without actual corresponding verification.
+>
+> ## 3. Phase 5 scope
+>
+> Implement functional versions of:
+> 1. Waiting Area TV — /display
+> 2. Owner Settings — /admin
+>
+> Reuse the existing backend operations, Supabase infrastructure and premium UI components.
+>
+> Do not rebuild the database or redesign the application.
+>
+> All customer, receptionist and barber functionality must remain operational.
+>
+> ## 4. Waiting Area TV integration
+>
+> Replace fictional TV fixtures with the existing authorized public display snapshot.
+>
+> Implement:
+> - SalonQ branding.
+> - Actual salon name.
+> - Current date and time in IST.
+> - Accurate realtime connection indicator.
+> - Full-screen display layout.
+> - Barber name and availability.
+> - Current assigned token for each barber.
+> - Called and In Chair status.
+> - Available, On Break and Off Duty states.
+> - Next five waiting tokens according to the approved display ordering rules.
+> - Estimated waiting times.
+> - Empty queue state.
+> - Connection-loss warning.
+> - Loading and error states.
+>
+> Never display fake live statistics.
+> Use authoritative backend data.
+>
+> ## 5. Newly called token experience
+>
+> When a customer is called:
+> - Automatically update the TV display.
+> - Highlight the newly called token with champagne gold.
+> - Display a prominent instruction identifying the assigned barber.
+> - Use a restrained animation lasting approximately five seconds.
+> - Provide an optional short notification chime.
+>
+> Implement audio using an original lightweight tone or appropriately licensed local asset.
+> Browser audio may require user interaction.
+> Provide a visible Enable Sound control and handle denied audio permissions gracefully.
+> The visual notification must work even when sound is unavailable.
+> Do not repeatedly play the same call notification after refresh or reconnection.
+> Support prefers-reduced-motion.
+>
+> ## 6. TV display design
+>
+> Preserve the existing premium charcoal/champagne-gold design.
+> Optimize for 1920 × 1080 displays.
+> Use:
+> - Large readable queue tokens.
+> - Clear Now Serving heading.
+> - Prominent barber station cards.
+> - High-contrast status labels.
+> - Organized Up Next section.
+> - Minimal unnecessary navigation.
+> - Tabular numerals.
+> - Adequate spacing.
+> - Full-screen browser support where available.
+> Ensure tokens are suitable for viewing from a distance.
+> Provide a responsive fallback for smaller devices.
+> Do not use unnecessary animation libraries or large visual dependencies.
+>
+> ## 7. Public display privacy
+>
+> The Waiting Area TV is publicly accessible.
+> Use only explicitly authorized public fields.
+> Never expose:
+> - Customer names.
+> - Customer phone numbers.
+> - Staff credentials.
+> - Private tracking capabilities.
+> - Raw private queue records.
+> - Internal security receipts.
+> - Unnecessary database identifiers.
+> Verify the actual network response and subscription payloads, not just the rendered DOM.
+> Reuse sanitized realtime signals and authorized snapshot fetching.
+> Never disable RLS or grant anonymous access to private queue tables.
+>
+> ## 8. Owner authentication and authorization
+>
+> Activate the existing protected /admin screen.
+> Use the already provisioned owner demonstration account.
+> Verify that:
+> - Anonymous users cannot access owner operations.
+> - Receptionists cannot execute owner operations.
+> - Barbers cannot execute owner operations.
+> - Owners can access the Owner Settings screen.
+> - Owners can also access Reception operations.
+> - Owners cannot perform unauthorized barber actions without assignment.
+> Restrict owner operations to the authoritative owner role.
+> Protect all owner backend operations.
+>
+> ## 9. Owner dashboard
+>
+> Connect the Owner Settings screen to the existing live owner snapshot.
+> Implement:
+> - Daily operational statistics computed strictly for the current day in Asia/Kolkata:
+>   - Customers served today.
+>   - Average waiting time from join to call.
+>   - Number of no-shows today.
+> - Accurate date and timezone handling.
+> - Clear distinction between today's actual performance and lifetime metrics.
+> - Loading, empty and error states.
+> - Do not permanently display hard-coded statistics.
+>
+> ## 10. Service catalog management
+>
+> Implement functional catalog management:
+> - Display existing services with English name, Gujarati name, duration, price and enabled state.
+> - Enable or disable services without deleting past transaction history.
+> - Add new services.
+> - Edit existing service names, prices and durations.
+> - Validate input.
+> - Price stored as an integer number of paise.
+> - Duration in whole minutes.
+> - Confirmation dialogs for significant changes.
+> - Disable services gracefully so active queue entries remain unaffected.
+>
+> ## 11. Barber duty management
+>
+> Implement barber duty controls for the owner:
+> - View all barbers.
+> - Change on-duty status.
+> - Change on-break status.
+> - Prevent taking a busy barber off duty.
+> - Prevent taking a barber off duty when customers are waiting specifically for them.
+> - Clear feedback when actions are blocked.
+>
+> ## 12. Salon operational controls
+>
+> Implement salon-level controls:
+> - Open or close the online queue manually.
+> - Clear confirmation dialog before closing the online queue.
+> - Update daily opening and closing hours.
+> - Automatic online admission cutoff 30 minutes before closing.
+> - Automatic walk-in admission cutoff at closing time.
+> - Enforce cutoff rules strictly on the backend.
+> - Reflect changes immediately across all affected screens.
+>
+> ## 13. End-to-end multi-screen realtime synchronization
+>
+> Verify realtime synchronization across all seven application screens:
+> 1. Home
+> 2. Join Queue
+> 3. My Status
+> 4. Reception Dashboard
+> 5. Barber Workspace
+> 6. Waiting Area TV
+> 7. Owner Settings
+>
+> Verify that when an event occurs:
+> - Customer joins: Reception and TV update.
+> - Barber is called: Customer status, Reception, Barber view and TV update.
+> - Service starts: Reception, Barber view and TV update.
+> - Service finishes: Reception, Barber view, Owner stats and TV update.
+> - Customer cancels: Reception and TV update.
+> - Customer marked no-show: Reception, Owner stats and TV update.
+> - Service catalog updated: Join Queue and Owner Settings update.
+> - Salon hours updated: Home, Join Queue and Owner Settings update.
+> - Online queue closed: Home, Join Queue and Reception update.
+>
+> Use the single sanitized change signal table salonq_changes.
+> No screen may subscribe directly to private queue tables.
+>
+> ## 14. Responsive and accessible implementation
+>
+> Ensure:
+> - TV display is optimized for large screens with a responsive fallback for small devices.
+> - Owner Settings works on desktop, tablet and mobile.
+> - All forms and dialogs are keyboard accessible.
+> - Tabular numbers are used for timers, prices and tokens.
+> - High contrast and readable typography are maintained.
+> - Bilingual support is preserved across all newly activated screens.
+>
+> ## 15. Security and privacy
+>
+> Verify:
+> - Zero customer PII on /display.
+> - Public display snapshot contains only authorized fields.
+> - Owner operations are strictly protected by role.
+> - Service and settings modifications validate permissions on the backend.
+> - No secrets, passwords or service-role keys are exposed to the client.
+> - Database RLS policies are strictly enforced.
+>
+> ## 16. Verification and test suite
+>
+> Run and report:
+> - All automated unit and integration tests.
+> - Hosted Supabase verification for Phase 5.
+> - SQL offline test assertions.
+> - Deno edge function type checks.
+> - Build and lint checks.
+> - Update docs/03-flows-rules.md acceptance scenarios verified during Phase 5.
+>
+> ## 17. Git and documentation
+>
+> Record the prompt in prompts.md identifying Google Antigravity as the coding agent.
+> Create docs/phase-5-verification.md with full evidence and manual test instructions.
+> Commit the completed implementation using:
+> feat: connect live TV display and owner management
+> Do not commit secrets, passwords or generated artifacts.
+> Do not push or deploy.
+>
+> ## 18. Final report
+> Provide the 18-point final report.
+

@@ -1,6 +1,6 @@
 # SalonQ — Flows & Rules
 
-**Stage:** Phase 3 Home, Join and private Status connected; five acceptance scenarios below passed in hosted React/jsdom integration. Staff/login/TV/Owner remain previews. Phase 3's 72 local tests, 64 SQL assertions, 37 local database checks and 14 hosted React checkpoints are separately documented in `phase-3-verification.md`. Browser layout, hard reload and actual cross-device/network verification remain pending. The college salon guide and approved decisions below remain authoritative.
+**Stage:** Phase 5 Waiting Area TV and Owner Settings connected; 14 acceptance scenarios below passed in hosted React/jsdom and isolated PostgreSQL. All seven screens connected. Phase 5's 108 automated tests, 67 SQL assertions, and 10 hosted Phase 5 checkpoints (alongside 17 hosted Phase 4 regression checkpoints) are documented in phase-5-verification.md. Browser layout, hard reload and actual cross-device/network verification remain pending. The college salon guide and approved decisions below remain authoritative.
 
 ## 1. Main workflows
 **Remote customer:** Home → Join → enter name/phone → select 1–3 services and barber/Any → confirm → receive unique token and private tracking access → watch position and estimated wait → arrival reminder at position 2 → reception calls → assigned barber starts service → barber completes → terminal status.
@@ -213,11 +213,11 @@ All items initially unchecked. During QA record actual PASS, FAIL or NOT RUN wit
 | T33 | Disconnect/reconnect | Stale warning then resync | [ ] |
 | T34 | Anonymous/incorrect-role staff request | Backend denies restricted data/actions | [ ] |
 | T35 | Wrong barber attempts Start/Done | Denied | [ ] |
-| T36 | Inspect TV/public requests | No phone, customer name or private credential exposed | [ ] |
+| T36 | Inspect TV/public requests | No phone, customer name or private credential exposed | [x] PASS — zero customer PII in public TV display, DOM and network verified in unit and hosted Supabase, Phase 5 |
 | T37 | Invalid tracking link | Generic error; no customer details | [ ] |
 | T38 | Toggle Gujarati on every route | All labels/messages translate without clipping | [ ] |
 | T39 | Phone/tablet/TV layouts | Readable, no overflow, usable controls | [ ] |
-| T40 | Owner stats with known sample data | Correct counts and mean wait | [ ] |
+| T40 | Owner stats with known sample data | Correct counts and mean wait | [x] PASS — owner statistics computed strictly today in IST with mean wait verified in unit and hosted snapshot, Phase 5 |
 | T41 | Production build and direct nested route refresh | Build succeeds; deployed route opens | [ ] |
 | T42 | Attempt remote and walk-in admission at 09:59:59 for 10:00 opening | Both rejected using server time; no entry created | [ ] |
 | T43 | Admit at exactly 10:00:00 with all other conditions valid | Both sources permitted; server timestamps and order recorded | [ ] |
@@ -261,16 +261,16 @@ All items initially unchecked. During QA record actual PASS, FAIL or NOT RUN wit
 | T81 | Inspect hosting/API logs, referrers, errors, storage and browser requests | Capability absent from path/query/logs/referrers; only opaque resume data stored; private responses no-store | [ ] |
 | T82 | Attempt direct edits of status, totals, snapshots, tokens or timestamps | Restricted grants/RPC checks deny bypasses; no client-authoritative values | [ ] |
 | T83 | Keyboard-only forms/dialogs and 320px Gujarati layouts | Labels, focus, 44px targets, contrast and wrapping remain usable | [ ] |
-| T84 | TV receives duplicate Called events, reconnects or audio permission is denied | Visual remains complete; one new-call chime at most; no historical replay | [ ] |
+| T84 | TV receives duplicate Called events, reconnects or audio permission is denied | Visual remains complete; one new-call chime at most; no historical replay | [x] PASS — TV display visual complete, audio toggle and duplicate call deduplication verified, Phase 5 |
 | T85 | Admission races with hours/switch/catalog/duty changes | Transaction serialization/recheck yields one consistent eligible outcome | [ ] |
 | T86 | Owner takes barber Off Duty with specific Waiting entries or active assignment | Rejected; preferences and current assignment preserved | [ ] |
-| T87 | Two owners save different versions of the same settings/service | Stale save rejected with review guidance; no silent lost update | [ ] |
-| T88 | Waiting duration is exactly 60 minutes, then exceeds 60 minutes | No long-wait highlight at equality; highlight/text appear only above threshold | [ ] |
+| T87 | Two owners save different versions of the same settings/service | Stale save rejected with review guidance; no silent lost update | [x] PASS — version-checked owner settings save and stale version rejection verified in offline SQL, Phase 5 |
+| T88 | Waiting duration is exactly 60 minutes, then exceeds 60 minutes | No long-wait highlight at equality; highlight/text appear only above threshold | [x] PASS — server-offset duration strictly highlights after 60 minutes verified in unit test, Phase 5 |
 | T89 | Browser clock is advanced to unlock cutoff or No-show | Server checks remain authoritative; spoofed timers cannot authorize changes | [ ] |
 | T90 | Catalog form has missing GU name, fractional/zero duration or invalid price | Shared exact bounds enforced by backend; valid zero price remains permitted | [ ] |
 | T91 | Public join/status attempts exceed configured rate limits | Server returns bounded generic rate-limit response; no extra entries or data leakage | [ ] |
 
-The scenario wording for T01–T91 is preserved. The nine explicitly evidenced results above (T01, T04, T06, T09, T10, T14, T16, T17, T18) are marked passed; their environment is hosted React/jsdom, not a real-browser visual review. All other unchecked rows mean NOT RUN as complete scenarios, even when isolated checks cover a rule. Phase 2 local tests, Phase 2.5 backend checks, Phase 3 customer evidence and Phase 4 staff integration evidence are separate. See `phase-4-verification.md` for exact scope and remaining browser/cross-device, hosted-race and timing work.
+The scenario wording for T01–T91 is preserved. The 14 explicitly evidenced results above (T01, T04, T06, T09, T10, T14, T16, T17, T18, T36, T40, T84, T87, T88) are marked passed; their environment is hosted React/jsdom and isolated PostgreSQL, not a real-browser visual review. All other unchecked rows mean NOT RUN as complete scenarios, even when isolated checks cover a rule. Phase 2 local tests, Phase 2.5 backend checks, Phase 3 customer evidence, Phase 4 staff integration evidence and Phase 5 TV/Admin evidence are separate. See `phase-5-verification.md` for exact scope and remaining browser/cross-device, hosted-race and timing work.
 
 ## 9. References and decisions
 College Salon Queue Management Vibe Coding Guide, pp. 4–6 (flows, rules, tests), pp. 8–9 (deployment and submission). Technical safeguards, position definitions, time-zone defaults, token sequence policy, and detailed estimator behavior above are explicit project decisions. Phase 1 adds previews, Phase 2 the backend, Phase 2.5 hosted activation, Phase 3 the three customer screens and Phase 4 the staff login, reception and barber views. Owner settings, TV screen, browser/cross-device review and remaining numbered scenarios are pending.

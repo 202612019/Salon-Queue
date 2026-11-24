@@ -9,7 +9,7 @@ type PendingCommand = { actor: string; action: string; payload: { [key: string]:
 function readPending(actor: string): PendingCommand | null {
   try {
     const value = JSON.parse(sessionStorage.getItem(storageKey) ?? 'null')
-    return value?.actor === actor && ['call_next', 'start', 'done', 'cancel', 'no_show', 'set_duty'].includes(value.action) && /^[0-9a-f]{64}$/.test(value.payload?.request_key) ? value : null
+    return value?.actor === actor && ['call_next', 'start', 'done', 'cancel', 'no_show', 'set_duty', 'save_service', 'save_settings'].includes(value.action) && /^[0-9a-f]{64}$/.test(value.payload?.request_key) ? value : null
   } catch { return null }
 }
 export function useStaffCommand(refresh: () => void, fresh: boolean) {

@@ -408,6 +408,10 @@
 .display-next-grid > div { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 18px; text-align: center; }
 .display-next-grid strong { display: block; font-weight: 500; font-size: 1.875rem; letter-spacing: -0.04em; }
 .display-next-grid span { color: var(--color-foreground-secondary); font-size: 1rem; margin-top: 6px; display: block; }
+.display-announcement { display: flex; align-items: center; justify-content: center; gap: 14px; background: var(--color-surface); border: 2px solid var(--color-accent); color: var(--color-accent); border-radius: 12px; padding: 18px 28px; margin-block: 20px 24px; font-size: 1.375rem; font-weight: 500; text-align: center; box-shadow: 0 0 24px rgba(212, 175, 55, 0.25); animation: callPulse 2s ease-in-out infinite; }
+@keyframes callPulse { 0%, 100% { transform: scale(1); border-color: var(--color-accent); } 50% { transform: scale(1.01); border-color: #f3e5ab; box-shadow: 0 0 36px rgba(212, 175, 55, 0.4); } }
+@media (prefers-reduced-motion: reduce) { .display-announcement { animation: none; } }
+.display-empty-next { color: var(--color-foreground-secondary); font-size: 1rem; padding: 24px; text-align: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
 .display-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; color: var(--color-foreground-muted); font-size: 0.8125rem; margin-top: 24px; }
 .display-footer > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .display-footer .button { font-size: 0.75rem; padding: 8px 12px; }

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Route, Routes, useLocation } from 'react-router'
+import { Navigate, Route, Routes, useLocation } from 'react-router'
 import { useLocale } from '../i18n/context'
 import { CustomerLayout, StaffLayout } from './layouts'
 import { HomePage } from '../features/home/HomePage'
@@ -35,5 +35,6 @@ export function App() {
       <Route path="admin" element={<AdminPage />} />
     </Route></Route>
     <Route path="display" element={<DisplayPage />} />
+    <Route path="tv" element={<Navigate to="/display" replace />} />
   </Routes></StaffProvider>
 }

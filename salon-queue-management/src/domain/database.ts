@@ -47,3 +47,7 @@ export type StaffBarber = { id: string; slug: string; display_name: string; on_d
 export type StaffEntry = CustomerEntry & { entry_id: string }
 export type ReceptionSnapshot = { server_time: string; barbers: StaffBarber[]; entries: StaffEntry[] }
 export type BarberSnapshot = { server_time: string; barber: StaffBarber; current: StaffEntry | null; next: Pick<CustomerEntry, 'token' | 'customer_name' | 'services'> | null }
+export type OwnerSettings = { salon_name: string; opening_time: string; closing_time: string; online_enabled: boolean; version: number }
+export type OwnerService = { id: string; name_en: string; name_gu: string; price_paise: number; duration_minutes: number; enabled: boolean; version: number }
+export type OwnerStatistics = { served: number; average_wait_minutes: number | null; no_shows: number }
+export type OwnerSnapshot = { server_time: string; barbers: StaffBarber[]; entries: StaffEntry[]; settings: OwnerSettings; services: OwnerService[]; statistics: OwnerStatistics }

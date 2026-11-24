@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Session } from '@supabase/supabase-js'
 import type { StaffState } from '../services/staff-auth'
-import type { BarberSnapshot, ReceptionSnapshot, StaffProfile } from '../domain/database'
+import type { BarberSnapshot, OwnerSnapshot, ReceptionSnapshot, StaffProfile } from '../domain/database'
 import { App } from '../app/App'
 import { LocaleProvider } from '../i18n/LocaleProvider'
 import { en, gu } from '../i18n/dictionaries'
@@ -23,7 +23,7 @@ vi.mock('../services/synchronization', () => ({ synchronizeSnapshot: (load: (sig
 } }))
 const userId = '30000000-0000-4000-8000-000000000099'
 const sampleSession = { access_token: 'fictional-unit-session', user: { id: userId } } as Session
-let reception: ReceptionSnapshot, barber: BarberSnapshot
+let reception: ReceptionSnapshot, barber: BarberSnapshot, owner: OwnerSnapshot
 function signIn(role: StaffProfile['role'] = 'receptionist', slug = 'ravi') {
   mock.auth = { session: sampleSession, profile: { user_id: userId, role, barber_id: role === 'barber' ? salonFixture.barbers.find(b => b.slug === slug)!.id : null, barber_slug: role === 'barber' ? slug : null }, error: null, checking: false }
 }
@@ -35,8 +35,31 @@ beforeEach(() => {
   const barbers = salonFixture.barbers.map(({ id, slug, display_name, on_duty, on_break }) => ({ id, slug, display_name, on_duty, on_break, version: 1 }))
   reception = { server_time: salonFixture.server_time, barbers, entries: [{ ...structuredClone(entryFixture), entry_id: 'unit-entry-1' }] }
   barber = { server_time: salonFixture.server_time, barber: barbers[0], current: { ...structuredClone(entryFixture), entry_id: 'unit-entry-1', status: 'called', version: 2, called_at: salonFixture.server_time, assigned_barber: { id: barbers[0].id, name: 'Ravi' } }, next: null }
+  owner = {
+    server_time: salonFixture.server_time,
+    barbers,
+    entries: [{ ...structuredClone(entryFixture), entry_id: 'unit-entry-1' }],
+    settings: {
+      salon_name: 'The Atelier',
+      opening_time: '10:00:00',
+      closing_time: '21:00:00',
+      online_enabled: true,
+      version: 1,
+    },
+    services: salonFixture.services.map(s => ({ ...s, enabled: true, version: 1 })),
+    statistics: { served: 5, average_wait_minutes: 24, no_shows: 1 },
+  }
   mock.public.mockResolvedValue(structuredClone(salonFixture))
-  mock.command.mockImplementation(async (action: string) => action === 'snapshot' ? structuredClone(mock.auth.profile?.role === 'barber' ? barber : reception) : { status: 'called', entry_id: 'unit-entry-1', version: 2 })
+  mock.command.mockImplementation(async (action: string) => {
+    if (action === 'snapshot') {
+      return structuredClone(
+        mock.auth.profile?.role === 'barber' ? barber :
+        mock.auth.profile?.role === 'owner' ? owner :
+        reception
+      )
+    }
+    return { status: 'called', entry_id: 'unit-entry-1', version: 2 }
+  })
   mock.admit.mockResolvedValue({ token: 'S-9002', locator: 'c'.repeat(32) }); mock.receipt.mockResolvedValue({ token: 'S-9002', locator: 'c'.repeat(32) })
   mock.signOut.mockImplementation(async () => { emit({ session: null, profile: null, error: null, checking: false }) })
   mock.signIn.mockImplementation(async () => { signIn(); emit(mock.auth); return mock.auth.profile })
@@ -59,8 +82,8 @@ describe('staff routes and credential form', () => {
     await user.type(screen.getByLabelText(en.email), 'staff@salonq.example'); await user.type(screen.getByLabelText(en.password), 'unit-only'); await user.click(screen.getByRole('button', { name: en.signIn }))
     expect(await screen.findByText(en.authFailed)).toBeVisible()
   })
-  it('redirects an owner to the protected Phase 5 pending design', async () => {
-    signIn('owner'); open('/login'); expect(await screen.findByText(en.ownerPending)).toBeVisible(); expect(screen.getByRole('heading', { name: en.adminTitle })).toBeVisible()
+  it('redirects an owner to the protected admin screen with live metrics and controls', async () => {
+    signIn('owner'); open('/login'); expect(await screen.findByRole('heading', { name: en.adminTitle })).toBeVisible(); expect(screen.getByText('05')).toBeVisible()
   })
   it('redirects a barber to the slug from their verified linkage and blocks another slug', async () => {
     signIn('barber'); const view = open('/login'); expect(await screen.findByRole('heading', { name: en.barberTitle })).toBeVisible(); view.unmount()
@@ -154,5 +177,64 @@ describe('server-offset timer display helpers', () => {
     const entry = { ...entryFixture, entry_id: 'unit' }, created = Date.parse(entry.created_at)
     expect(longWait(entry, created + 3600000)).toBe(false); expect(longWait(entry, created + 3600001)).toBe(true)
     expect(elapsedSeconds(entry.created_at, created + 75000)).toBe(75); expect(formatElapsed(75)).toBe('01:15')
+  })
+})
+describe('Owner operational management', () => {
+  it('loads live statistics, opening hours, services, and team duty', async () => {
+    signIn('owner'); open('/admin')
+    expect(await screen.findByRole('heading', { name: en.adminTitle })).toBeVisible()
+    expect(screen.getByText('05')).toBeVisible()
+    expect(screen.getByText('24 min')).toBeVisible()
+    expect(screen.getByText('01')).toBeVisible()
+    expect(screen.getByText(salonFixture.services[0].name_en)).toBeVisible()
+    expect(screen.getByText(salonFixture.barbers[0].display_name)).toBeVisible()
+  })
+  it('prompts confirmation modal before turning off online queue', async () => {
+    signIn('owner'); const user = userEvent.setup(); open('/admin')
+    const queueSwitch = await screen.findByRole('switch', { name: en.onlineQueue })
+    expect(queueSwitch).toBeChecked()
+    await user.click(queueSwitch)
+    expect(screen.getByRole('heading', { name: en.confirmCloseOnlineTitle })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: en.confirmAction }))
+    expect(mock.command.mock.calls.find(call => call[0] === 'save_settings')?.[1]).toEqual(
+      expect.objectContaining({ online_enabled: false, version: 1 })
+    )
+  })
+  it('requires confirmation before updating opening hours', async () => {
+    signIn('owner'); const user = userEvent.setup(); open('/admin')
+    await screen.findByRole('heading', { name: en.adminTitle })
+    const opensInput = screen.getByLabelText(en.opens)
+    await user.clear(opensInput)
+    await user.type(opensInput, '09:00')
+    const saveBtn = screen.getByRole('button', { name: en.saveHours })
+    expect(saveBtn).toBeEnabled()
+    await user.click(saveBtn)
+    expect(screen.getByRole('heading', { name: en.confirmSettingsTitle })).toBeVisible()
+    await user.click(screen.getByRole('button', { name: en.confirmAction }))
+    expect(mock.command.mock.calls.find(call => call[0] === 'save_settings')?.[1]).toEqual(
+      expect.objectContaining({ opening_time: '09:00:00', closing_time: '21:00:00' })
+    )
+  })
+  it('toggles service enablement', async () => {
+    signIn('owner'); const user = userEvent.setup(); open('/admin')
+    await screen.findByRole('heading', { name: en.adminTitle })
+    const service = salonFixture.services[0]
+    const toggle = screen.getByRole('switch', { name: `${service.name_en} · ${en.enabled}` })
+    await user.click(toggle)
+    expect(mock.command.mock.calls.find(call => call[0] === 'save_service')?.[1]).toEqual(
+      expect.objectContaining({ id: service.id, enabled: false })
+    )
+  })
+  it('toggles barber duty and break', async () => {
+    signIn('owner'); const user = userEvent.setup(); open('/admin')
+    await screen.findByRole('heading', { name: en.adminTitle })
+    const barber0 = salonFixture.barbers[0]
+    const dutySwitch = screen.getByRole('switch', { name: `${barber0.display_name} · ${en.barbersOnDuty}` })
+    expect(dutySwitch).toBeChecked()
+    const breakBtns = screen.getAllByRole('button', { name: en.takeBreak })
+    await user.click(breakBtns[0])
+    expect(mock.command.mock.calls.find(call => call[0] === 'set_duty')?.[1]).toEqual(
+      expect.objectContaining({ barber_id: barber0.id, on_duty: true, on_break: true })
+    )
   })
 })

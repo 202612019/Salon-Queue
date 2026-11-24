@@ -41,3 +41,6 @@ export function Metric({ label, value, hint, icon: Icon }: { label: string; valu
 export function ReadOnlySwitch({ label, checked = true }: { label: string; checked?: boolean }) {
   return <button className="switch" type="button" role="switch" aria-label={label} aria-checked={checked} disabled><span /></button>
 }
+export function Switch({ label, checked = false, disabled = false, onChange }: { label: string; checked?: boolean; disabled?: boolean; onChange?: (checked: boolean) => void }) {
+  return <button className="switch" type="button" role="switch" aria-label={label} aria-checked={checked} disabled={disabled} onClick={() => onChange?.(!checked)}><span /></button>
+}
