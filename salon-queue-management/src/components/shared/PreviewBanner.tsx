@@ -19,5 +19,5 @@ export function OfflineNotice() {
     window.addEventListener('offline', update)
     return () => { window.removeEventListener('online', update); window.removeEventListener('offline', update) }
   }, [])
-  return offline ? <aside role="status" className="offline-notice"><WifiOff size={18} aria-hidden="true" /><strong>{t('offline')}</strong><span>{t('offlineBody')}</span></aside> : null
+  return offline ? <aside role="status" className="offline-notice"><WifiOff size={18} aria-hidden="true" /><strong>{t('offline')}</strong><span>{t('staleData')}</span></aside> : null
 }

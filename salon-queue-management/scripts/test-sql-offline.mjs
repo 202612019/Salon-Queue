@@ -1,4 +1,4 @@
-import { readFile, mkdir, writeFile } from 'node:fs/promises'
+import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
 import { resolve } from 'node:path'
 
@@ -8,7 +8,8 @@ const executable = process.env.SALONQ_POSTGRES_BIN ?? 'C:/Program Files/PostgreS
 const database = 'salonq_offline_' + Date.now()
 const created = spawnSync(executable, ['--single', '-j', '-D', data, 'postgres'], { input: 'create database ' + database + ';\n\n', encoding: 'utf8', timeout: 30000 })
 if (created.error || created.status !== 0 || /\b(ERROR|FATAL|PANIC):/.test((created.stdout ?? '') + (created.stderr ?? ''))) throw new Error('Cannot create isolated offline test database.')
-const files = ['supabase/tests/bootstrap.sql', 'supabase/migrations/20261124000100_salonq_schema.sql', 'supabase/migrations/20261124000200_salonq_operations.sql', 'supabase/seed.sql', 'supabase/tests/offline.sql']
+const migrations = (await readdir('supabase/migrations')).filter(file => file.endsWith('.sql')).sort().map(file => 'supabase/migrations/' + file)
+const files = ['supabase/tests/bootstrap.sql', ...migrations, 'supabase/seed.sql', 'supabase/tests/offline.sql']
 const sql = (await Promise.all(files.map(file => readFile(file, 'utf8')))).join('\n').replace(/\n[ \t]*\n/g, '\n') + '\n\n'
 const result = spawnSync(executable, ['--single', '-j', '-D', data, database], { input: sql, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024, timeout: 60000 })
 const output = (result.stdout ?? '') + '\n' + (result.stderr ?? '')

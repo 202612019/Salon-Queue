@@ -10,7 +10,11 @@ Passwords are random and stored only in the ignored `.artifacts/demo-accounts.dp
 ./scripts/Copy-DemoPassword.ps1 -Email owner-demo@salonq.example
 ```
 
-Paste within 30 seconds and leave that terminal open for clipboard cleanup. Use another listed email for another account. The clipboard action itself has not been run by the agent; script syntax and DPAPI encryption/decryption were checked separately. For password rotation use Dashboard Authentication → Users for the specific fictional user, set a new strong password locally, and keep it in your password manager; the saved vault then contains the old password for that user. Do not send passwords or tokens into chat or Git. The app login screen remains a preview until Phase 3.
+Paste within 30 seconds and leave that terminal open for clipboard cleanup. Use another listed email for another account. The clipboard action itself has not been run by the agent; script syntax and DPAPI encryption/decryption were checked separately. For password rotation use Dashboard Authentication → Users for the specific fictional user, set a new strong password locally, and keep it in your password manager; the saved vault then contains the old password for that user. Do not send passwords or tokens into chat or Git. The app login screen remains a preview until the staff-integration phase.
+
+## Phase 3 customer update
+
+Home/Join/private Status are now functional; staff/login/TV/Owner remain previews. Additive migration `20261124000300_public_barber_estimates.sql` is applied, exposing only per-barber public estimates using the existing trusted estimator. The original migrations and queue rules are unchanged. The actual customer components passed 14 hosted React/jsdom checkpoints, including lost-response recovery and cancellation; see `docs/phase-3-verification.md`. Local SQL assertions now total 64; 37 local integration/race checks were rerun with all migrations. No new Edge deployment was required.
 
 ## What is included
 
@@ -178,7 +182,7 @@ In another terminal, from the application directory, run `npm run test:db`. Stop
 ## Current limitations and next work
 
 - Hosted migrations, Edge deployment, signup configuration, seed and all five staff profiles are applied and smoke-tested. No activation-related operator action remains.
-- No functional screen/login integration, live statistics or successful queue action is presented by the frontend yet.
-- All 91 numbered application acceptance scenarios remain unchecked. Local foundation tests are reported separately.
+- Customer Home/Join/private Status are connected in Phase 3. Staff/login/TV/Owner remain preview screens; no staff UI operation is enabled.
+- Five customer acceptance scenarios passed with the hosted React/jsdom scope in `docs/phase-3-verification.md`; 86 remain unchecked. Local tests and browser checks are reported separately.
 - Hosted RLS/grants, real Auth/profile checks and one measured sanitized realtime delivery are verified. Hosted concurrency races, browser/cross-device reconnect behavior, refresh-token revocation and rendered accessibility/responsiveness remain unverified; the 37 local integration checks are separate evidence.
 - No Vercel deployment, push, real customer data or staff passwords are included.

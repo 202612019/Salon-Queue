@@ -27,3 +27,19 @@ export type AdmissionRequest = {
 }
 export type AdmissionReceipt = { locator: string; token: string }
 export type Estimate = { state: 'ready' | 'approximate' | 'uncertain' | 'unavailable'; minutes: number | null; position: number; position_kind: 'global' | 'barber' }
+export type QueueState = 'waiting' | 'called' | 'in_chair' | 'done' | 'cancelled' | 'no_show'
+export type CatalogService = ServiceSelection & { name_en: string; name_gu: string; enabled: boolean }
+export type PublicBarber = { id: string; slug: string; display_name: string; on_duty: boolean; on_break: boolean; token: string | null; status: QueueState | null; called_at: string | null; estimate?: Estimate }
+export type PublicSalon = {
+  server_time: string; salon_name: string; timezone: string; opening_time: string; closing_time: string; online_enabled: boolean
+  admission: { online: boolean; walk_in: boolean; reason: string }; waiting_count: number; estimate: Estimate
+  services: CatalogService[]; barbers: PublicBarber[]; next_tokens: { token: string; estimate: Estimate }[]
+}
+export type CustomerEntry = {
+  token: string; customer_name: string; status: QueueState; source: 'remote' | 'walk_in'; version: number
+  created_at: string; called_at: string | null; started_at: string | null; terminal_at: string | null
+  total_paise: number; total_minutes: number; estimate: Estimate | null
+  preferred_barber: { id: string; name: string; on_duty: boolean; on_break: boolean } | null
+  assigned_barber: { id: string; name: string } | null
+  services: { id: string; name_en: string; name_gu: string; price_paise: number; duration_minutes: number }[]
+}

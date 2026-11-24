@@ -1,6 +1,6 @@
 # SalonQ — Screens & Features
 
-**Stage:** Phase 1 frontend foundation remains clearly labeled, read-only previews. Phase 2.5 activates/verifies the hosted backend and existing service adapters without redesigning screens or enabling preview actions. Phase 3 screen integration remains pending. Functional screen specifications below remain targets for later feature phases. All seven screens remain required. Business rules in `03-flows-rules.md` govern all operations. Only the canonical `salon-queue-management/` documents govern development.
+**Stage:** Phase 3 makes Home, Join and private My Status functional against the hosted backend while retaining the approved identity/layouts. Home uses real public data, Join has three visible steps and a sticky summary, and private Status retains/enhances the digital pass with circular estimates, progress, Called/arrival notices, private copying and confirmed cancellation. Explicit `/status/preview` and staff/Login/TV/Owner remain clearly fictional previews. No new rendered mobile/desktop/Gujarati verification is claimed. All seven screens remain required; remaining feature targets below still apply. Business rules in `03-flows-rules.md` govern operations.
 
 ## Phase 1 desktop design approval and deferred refinements
 
@@ -15,7 +15,7 @@ Preserve the existing branding, typography, charcoal/champagne-gold palette, nav
 | My Status | Preserve the digital queue pass. Add an elegant circular approximate-wait visualization that never promises a guaranteed countdown and represents unavailable/overrun states honestly. Refine status progression. Add secure Copy Status Link following the approved capability/fragment contract. Show a prominent gold Called notification with the assigned barber, accessible status announcements and reduced-motion behavior. |
 | All affected features | Maintain EN/GU text and shared tokens; avoid unnecessary dependencies and excessive animation. Keep previews explicitly fictional until real functionality exists. Never fabricate live statistics or use unlicensed imagery. Preserve all business rules, architecture, security controls and remaining visual QA obligations. |
 
-Any photo is optional, not an MVP dependency. Existing initials remain acceptable until avatar refinements are implemented. The current unconditional sample break warning is a known preview limitation to address when Join functionality is connected; it is not a live availability claim. The original 91 numbered acceptance scenarios remain unchecked.
+Any photo is optional, not an MVP dependency; none was introduced. Phase 3 uses consistent initial avatars for actual barber records, conditional break warnings, tighter Home hero spacing and real featured services. Join's existing desktop layout and service cards remain, with a three-step indicator, count out of three and accessible selection. Status retains its pass with approximate circular wait, progress and private-link/cancellation controls. These are functional implementation changes, not a new rendered visual approval. Five numbered acceptance scenarios passed with the precise hosted React/jsdom scope in `phase-3-verification.md`; 86 remain unchecked.
 
 ## SalonQ brand identity
 

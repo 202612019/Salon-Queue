@@ -126,3 +126,4 @@ select public.test_fails('select public.salonq_staff_command(''save_settings'',j
 select public.test_assert((public.salonq_staff_command('snapshot')->'next'->>'token') is not null,'linked barber receives minimal next preview');
 reset role;
 select public.test_assert(not (public.salonq_gateway('public_snapshot')::text like '%locator%'),'public tokens do not expose status locators');
+select public.test_assert((select count(*)=3 and bool_and(barber->'estimate' is not null) from jsonb_array_elements(public.salonq_gateway('public_snapshot')->'barbers') barber),'public barber estimates use the existing authoritative estimator');

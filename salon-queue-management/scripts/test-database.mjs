@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { strict as assert } from 'node:assert'
 import pg from 'pg'
 import { randomBytes } from 'node:crypto'
@@ -55,7 +55,7 @@ try {
   // Roles are cluster-wide; bootstrap conditionally creates them. Auth is per database.
   const bootstrap = await readFile(new URL('../supabase/tests/bootstrap.sql', import.meta.url), 'utf8')
   await db.query(bootstrap)
-  for (const file of ['20261124000100_salonq_schema.sql', '20261124000200_salonq_operations.sql']) await db.query(await readFile(new URL(`../supabase/migrations/${file}`, import.meta.url), 'utf8'))
+  for (const file of (await readdir('supabase/migrations')).filter(file => file.endsWith('.sql')).sort()) await db.query(await readFile(new URL(`../supabase/migrations/${file}`, import.meta.url), 'utf8'))
   await db.query(await readFile(new URL('../supabase/seed.sql', import.meta.url), 'utf8'))
   await clock(firstDate)
   await db.query('insert into auth.users(id) values ($1),($2),($3),($4)', [owner, reception, barberUser, stranger])

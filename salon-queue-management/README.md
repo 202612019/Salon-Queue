@@ -1,8 +1,8 @@
 # SalonQ — Smart Salon Queue Management
 
-**Phase 2.5: hosted backend activated and verified; frontend integration next.** Your Time. Your Turn.
+**Phase 3: live customer Home, Join and private Status.** Your Time. Your Turn.
 
-This application contains seven visually representative, read-only route previews, shared customer/staff layouts, a Lucide scissors wordmark, centralized charcoal/champagne-gold tokens, local typography, English/Gujarati dictionaries, a staff sign-in shell, Not Found handling and an application error boundary. Preview values are fictional. Staff preview pages are publicly viewable design fixtures, not authenticated staff sessions; no credentials are accepted and no queue or settings mutations occur through the UI. Phase 2 adds the trusted backend and service helpers; Phase 2.5 activates the hosted database/Auth/Edge/Realtime and verifies real operations. Screen integration remains pending. See [the backend setup and password guide](supabase/README.md).
+Home, Join and private Status are connected to the activated Supabase backend. They support real catalog/availability, admission, secure receipt recovery, private resume, live status and confirmed Waiting cancellation in English/Gujarati. The approved charcoal/champagne-gold identity, local fonts and digital pass remain. Reception, Barber, Display, Owner and staff Login remain explicitly fictional read-only previews; they grant no staff session or mutations. `/status/preview` remains an isolated sample. See [Phase 3 verification](docs/phase-3-verification.md) and [the backend guide](supabase/README.md).
 
 ## Run locally
 
@@ -24,16 +24,16 @@ npm run preview
 
 `build` checks TypeScript and generates ignored `dist/` output. `preview` serves that output on `http://127.0.0.1:4173/`. `test` runs Vitest and Testing Library in jsdom, not a real browser.
 
-`.env.example` contains blank public Supabase placeholders only. The frontend previews do not require credentials to run, and setting these variables does not activate their controls. Never put a secret/service-role key in `VITE_` variables. Local environment files, dependencies and generated output are ignored by Git. `npm run env:check` verifies the local configuration without printing values.
+`.env.example` contains blank public Supabase placeholders only. Live customer screens require the configured hosted URL/publishable key in ignored `.env.local`; missing configuration shows a safe unavailable state. Staff previews remain disabled. Never put a secret/service-role key in `VITE_` variables. Local environment files, private test artifacts, dependencies and generated output are ignored. `npm run env:check` prints safety booleans only.
 
 ## Routes and structure
 
 | Route | Foundation behavior |
 |---|---|
-| `/` | Home and fictional salon/queue overview |
-| `/join` | Disabled sample form, selected service cards and summary |
+| `/` | Actual public salon overview/catalog/barber availability with private resume |
+| `/join` | Customer admission, validation, dynamic service summary and secure pending-request recovery |
 | `/status/preview` | Fictional digital queue pass |
-| `/status/:id` for any other ID | Generic private-status explanation, no customer lookup |
+| `/status/:id` for actual locator | Capability-authorized own status, immutable services, live progression, private copying and confirmed Waiting cancellation; generic denial without valid access |
 | `/reception` | Read-only fictional reception layout |
 | `/barber/ravi` (also `/barber/amit`, `/barber/imran`) | Read-only fictional barber workspace |
 | `/display` | Public token-only preview, local IST clock, fullscreen with error handling |
@@ -49,6 +49,7 @@ src/
   features/            home, join, status, reception, barber, display, admin, auth, errors
   domain/              preview models and typed RPC/admission contracts
   services/            fixtures, backend transport, staff Auth, private access, synchronization
+  hooks/               authorized snapshot lifecycle and cleanup
   lib/                 formatting, environment contract, lazy Supabase client, class helpers
   i18n/                typed EN/GU dictionaries and language preference
   styles/              centralized Tailwind/CSS tokens and responsive presentation
@@ -140,3 +141,24 @@ Necessary corrections discovered by real integration: the email-provider flag mu
 | Password protection | PASS — Windows DPAPI encryption/decryption round trip; clipboard helper syntax checked; clipboard copying itself NOT RUN |
 
 The five fictional account emails and local password-copy procedure are in [the backend guide](supabase/README.md). Passwords are encrypted only in ignored `.artifacts/demo-accounts.dpapi.json`; no password or backend credential is committed. No activation-related manual action remains. The backend operations requested for Phase 3 are verified and ready for screen integration, which is not implemented yet. Browser layout/accessibility, cross-device screen updates/reconnect, hosted concurrency/timing matrices and the 91 complete application acceptance scenarios remain unverified/unchecked. The original 63 local SQL and 37 local integration checks remain historical local evidence, not new hosted passes. Stop after Phase 2.5; no Vercel deployment or push is performed.
+
+## Phase 3 customer integration — 24 November 2026
+
+Earlier phase sections above are historical records. Phase 3 connects only Home, Join and private My Status. The final hosted React/jsdom run passed **14 checkpoints** using actual Supabase and restricted demo staff sessions: actual admission, totals, secure private resume, deliberately lost response recovery, mounted Called/In Chair/Done updates, Gujarati service/status switching and persisted Waiting cancellation. No admission or lifecycle success was mocked in that run. All final-run fictional entries are terminal.
+
+| Verification | Actual result |
+|---|---|
+| Automated local tests | PASS — 72 / five files |
+| Lint | PASS — zero warnings |
+| Production build | PASS — TypeScript/Vite; non-fatal >500 kB bundle warning with the real Supabase SDK |
+| Isolated PostgreSQL assertions | PASS — 64 |
+| Local database/race checks | PASS — 37 with all current migrations |
+| Hosted React integration | PASS — one opt-in jsdom test, 14 checkpoints; 27.36s run |
+| Acceptance scenarios | T01, T04, T06, T16, T17 PASS with explicit hosted React/jsdom scope; 86 remain unchecked |
+| Rendered browser layouts/screenshots | NOT RUN — prior tooling restrictions respected |
+
+A necessary additive migration supplies named-barber public estimates from the existing trusted estimator; original migrations, authorization and queue rules are unchanged. The Edge Function was reused without rewrite/redeployment. Existing service cards, the sticky Join summary and digital queue pass remain. Enhancements include tighter Home spacing, real featured services, three visible Join steps/count, circular approximate wait, progression/Called/arrival announcements, private copying and a focused cancellation dialog. All new labels/errors have centralized EN/GU translations. No new dependencies or photographs were added.
+
+One shared sanitized subscription serves independently authorized loaders, with readiness/reconnect/foreground reconciliation and a four-second fallback. Five-second cross-device browser timing remains unmeasured; the headless test allowed eight seconds per status assertion. Mutation timeouts preserve bound recovery identity. No private name/phone/selection is cached locally.
+
+Run `npm run dev -- --port 5174` and open `http://127.0.0.1:5174/`. Follow [the complete verification record and exact manual steps](docs/phase-3-verification.md) for actual browser refresh, private-link sharing, offline transport, keyboard/accessibility and responsive Gujarati review. Staff dashboard integration is next. No frontend deployment or push was performed.

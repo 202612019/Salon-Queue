@@ -8,6 +8,12 @@ import { LocaleProvider } from '../i18n/LocaleProvider'
 import { en, gu } from '../i18n/dictionaries'
 import { formatPrice, formatSalonDate, formatSalonClock } from '../lib/format'
 import { publicEnvironment } from '../lib/env'
+vi.mock('../services/backend', async importOriginal => ({ ...await importOriginal<typeof import('../services/backend')>(), getPublicSalon: vi.fn().mockRejectedValue(new Error('BACKEND_UNAVAILABLE')) }))
+vi.mock('../services/synchronization', () => ({ synchronizeSnapshot: (load: (signal: AbortSignal) => Promise<unknown>, onState: (state: unknown) => void) => {
+  let stopped = false
+  void load(new AbortController().signal).then(data => { if (!stopped) onState({ data, connection: 'live', lastUpdated: Date.now(), error: null }) }).catch(() => { if (!stopped) onState({ data: null, connection: 'stale', lastUpdated: null, error: 'BACKEND_UNAVAILABLE' }) })
+  return () => { stopped = true }
+} }))
 
 function openPage(path = '/') {
   return render(<LocaleProvider><MemoryRouter initialEntries={[path]}><App /></MemoryRouter></LocaleProvider>)
@@ -18,17 +24,18 @@ describe('frontend route shells', () => {
     ['/', 'Your Time.Your Turn.'], ['/join', en.joinTitle], ['/status/preview', en.statusTitle],
     ['/reception', en.receptionTitle], ['/barber/ravi', en.barberTitle], ['/display', en.nowServing],
     ['/admin', en.adminTitle], ['/login', en.loginTitle], ['/unknown-page', en.notFoundTitle],
-  ])('renders %s with a single main landmark and preview disclosure', (path, heading) => {
+  ])('renders %s with one main landmark and the appropriate preview boundary', (path, heading) => {
     openPage(path)
     expect(screen.getAllByRole('main')).toHaveLength(1)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(heading)
-    expect(screen.getByText(en.previewDetail)).toBeVisible()
+    if (!['/', '/join'].includes(path)) expect(screen.getByText(en.previewDetail)).toBeVisible()
+    else expect(screen.queryByText(en.previewDetail)).not.toBeInTheDocument()
   })
 
   it('uses real router navigation for customer exploration', async () => {
     const user = userEvent.setup()
     openPage()
-    await user.click(screen.getByRole('main').querySelector('a[href="/join"]')!)
+    await user.click(screen.getAllByRole('link', { name: en.join })[0])
     expect(screen.getByRole('heading', { level: 1, name: en.joinTitle })).toBeVisible()
   })
 
@@ -55,11 +62,10 @@ describe('frontend route shells', () => {
 
   it('keeps join form and submission unavailable without a backend', () => {
     openPage('/join')
-    expect(screen.getByLabelText(en.name)).toBeDisabled()
-    expect(screen.getByLabelText(en.phone)).toBeDisabled()
+    expect(screen.getByLabelText(en.name)).toBeEnabled()
+    expect(screen.getByLabelText(en.phone)).toBeEnabled()
     expect(screen.getByRole('button', { name: en.confirmJoin })).toBeDisabled()
-    expect(screen.getByText(en.joinUnavailable)).toBeVisible()
-    expect(screen.getAllByRole('checkbox').filter(input => (input as HTMLInputElement).checked)).toHaveLength(2)
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
   })
 
   it('never includes customer identities on the public TV preview', () => {
@@ -80,7 +86,7 @@ describe('frontend route shells', () => {
     openPage()
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
     fireEvent(window, new Event('offline'))
-    expect(screen.getByRole('status')).toHaveTextContent(en.offline)
+    expect(screen.getByText(en.offline)).toBeVisible()
     expect(screen.getByRole('heading', { level: 1 })).toBeVisible()
   })
 
@@ -126,8 +132,8 @@ describe('language and formatting foundation', () => {
     expect(formatSalonClock(date, 'en')).toMatch(/12:30/)
   })
 
-  it('does not enable backend operations from public environment values', () => {
-    expect(publicEnvironment.backendOperationsEnabled).toBe(false)
-    expect(publicEnvironment.phase).toBe('frontend-foundation')
+  it('records the authorized customer integration phase without enabling staff screens', () => {
+    expect(publicEnvironment.backendOperationsEnabled).toBe(true)
+    expect(publicEnvironment.phase).toBe('customer-integration')
   })
 })

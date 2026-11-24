@@ -1,6 +1,6 @@
 # SalonQ — Project Brief & Scope
 
-**Version:** 1.5 | **Stage:** Phase 2.5 hosted backend activated: existing migrations/seed applied, signup disabled with staff sign-in enabled, five protected demo accounts provisioned, Edge deployed, and 27 hosted smoke checks passed including actual sanitized realtime delivery. The backend is ready for Phase 3 screen integration; the frontend remains the approved read-only Phase 1 preview. The user approved desktop Home, Join Queue and My Status at `http://127.0.0.1:5174/`. Other screens, exact viewport sizes and Gujarati layouts are not visually verified. See the application README and `supabase/README.md` for verification/setup, and `02-screens.md` for deferred refinements.
+**Version:** 1.6 | **Stage:** Phase 3 connects Home, Join and private My Status to the activated Supabase backend. Hosted React/jsdom verified admission, private resume, lost-response recovery, live status transitions and cancellation; staff/login/TV/Owner remain fictional previews. Five numbered acceptance cases passed with that scope; 86 remain unchecked. Earlier desktop design approval is retained, but no new rendered browser/mobile/Gujarati layout verification is claimed. See `phase-3-verification.md`, the application README and `supabase/README.md` for evidence/setup.
 
 **Canonical project:** `D:/My Folder/Salon Queue/Salon-Queue/salon-queue-management`, inside the existing `Salon-Queue` Git checkout. These four documents are the sole implementation source of truth. The unchanged pre-Phase-0 reviewed set is archived outside Git at `../../planning-backups/2026-11-24-phase0-reviewed/`; archived copies are not active requirements. **College deadline:** 24 November 2026, 11:59 PM IST. Deliver the functional, secure MVP through small tasks; avoid unnecessary research and dependencies.
 
@@ -84,7 +84,7 @@ Customers read/cancel only their own capability-authorized entry, with cancellat
 
 ## Planned application structure
 
-Phase 1 implements the frontend directories below, route shells, shared components, local fonts and tests. Phase 2 adds the Supabase schema, operations, Edge boundary and client service helpers; Phase 2.5 applies/deploys them and verifies actual hosted operations. Screen integration remains future work. Preview fixtures are fictional, and staff preview pages grant no authenticated access. No queue operation succeeds through the preview UI.
+Phase 1 implements the frontend foundation; Phase 2 adds backend/schema/service helpers; Phase 2.5 activates hosted services. Phase 3 connects only the three customer screens, with one shared sanitized subscription and separately authorized public/private snapshots. Explicit `/status/preview` and staff screens remain isolated fictional fixtures granting no staff access. An additive migration supplies per-barber public estimates from the existing authoritative estimator; original migrations and queue rules are unchanged.
 
 ```text
 salon-queue-management/
@@ -96,6 +96,7 @@ salon-queue-management/
     features/                home, join, status, reception, barber, display, admin, auth
     domain/                  types and pure preview/formatting helpers
     services/                typed backend operations and synchronization
+    hooks/                   authorized snapshot lifecycle hooks
     lib/                     Supabase client, server-time and currency helpers
     i18n/                    centralized English/Gujarati dictionaries
     styles/

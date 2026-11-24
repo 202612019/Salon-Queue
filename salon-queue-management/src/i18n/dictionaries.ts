@@ -1,8 +1,10 @@
+import { customerEn, customerGu } from './customer'
 export const en = {
+  ...customerEn,
   appName: 'SalonQ', fullName: 'SalonQ — Smart Salon Queue Management', tagline: 'Your Time. Your Turn.',
   home: 'Home', join: 'Join queue', myStatus: 'My status', reception: 'Reception', barber: 'Barber workspace', display: 'Waiting area', admin: 'Salon settings', login: 'Staff sign in',
   language: 'Change language', skip: 'Skip to content', menu: 'Open navigation', closeMenu: 'Close navigation',
-  preview: 'Fictional preview', previewShort: 'Design preview', previewDetail: 'Sample data only. Queue joining and staff actions are not connected.', previewNote: 'Nothing on this screen creates or changes a queue entry.',
+  preview: 'Fictional preview', previewShort: 'Design preview', previewDetail: 'This screen shows sample data only. Its queue and staff actions are not connected.', previewNote: 'Nothing on this screen creates or changes a queue entry.',
   previewNav: 'Explore the previews', previewNavHint: 'Seven screens. One considered experience.', sample: 'Sample', notLive: 'Not live', notConnected: 'Not connected',
   salonName: 'The Atelier', salonType: 'A fictional salon, thoughtfully connected.', salonHours: 'Sample hours', hoursValue: '10:00–21:00 IST', sampleOpen: 'Open in this example', sampleClosing: 'Online joining until 20:30',
   welcome: 'A better way to wait', heroFirst: 'Your Time.', heroSecond: 'Your Turn.', heroBody: 'A fresh look should fit your day. Choose your services, find your barber, and spend less time in the waiting room.', exploreJoin: 'Explore joining', viewStatus: 'Preview a token',
@@ -44,10 +46,11 @@ export type TranslationKey = keyof typeof en
 export type Locale = 'en' | 'gu'
 
 export const gu: Record<TranslationKey, string> = {
+  ...customerGu,
   appName: 'SalonQ', fullName: 'SalonQ — સ્માર્ટ સલૂન કતાર વ્યવસ્થાપન', tagline: 'તમારો સમય. તમારો વારો.',
   home: 'મુખ્ય પૃષ્ઠ', join: 'કતારમાં જોડાઓ', myStatus: 'મારી સ્થિતિ', reception: 'રિસેપ્શન', barber: 'વાળંદનું કાર્યસ્થળ', display: 'પ્રતીક્ષા વિસ્તાર', admin: 'સલૂન સેટિંગ્સ', login: 'સ્ટાફ સાઇન ઇન',
   language: 'ભાષા બદલો', skip: 'મુખ્ય સામગ્રી પર જાઓ', menu: 'નેવિગેશન ખોલો', closeMenu: 'નેવિગેશન બંધ કરો',
-  preview: 'કાલ્પનિક પૂર્વાવલોકન', previewShort: 'ડિઝાઇન પૂર્વાવલોકન', previewDetail: 'માત્ર નમૂના માહિતી. કતારમાં જોડાવું અને સ્ટાફની ક્રિયાઓ જોડાયેલાં નથી.', previewNote: 'આ પૃષ્ઠથી કોઈ કતાર નોંધ બનતી કે બદલાતી નથી.',
+  preview: 'કાલ્પનિક પૂર્વાવલોકન', previewShort: 'ડિઝાઇન પૂર્વાવલોકન', previewDetail: 'આ પૃષ્ઠ પર માત્ર નમૂના માહિતી છે. તેની કતાર અને સ્ટાફની ક્રિયાઓ જોડાયેલાં નથી.', previewNote: 'આ પૃષ્ઠથી કોઈ કતાર નોંધ બનતી કે બદલાતી નથી.',
   previewNav: 'પૂર્વાવલોકન જુઓ', previewNavHint: 'સાત પૃષ્ઠો. એક સુવ્યવસ્થિત અનુભવ.', sample: 'નમૂનો', notLive: 'લાઇવ નથી', notConnected: 'જોડાયેલ નથી',
   salonName: 'The Atelier', salonType: 'એક કાલ્પનિક સલૂન, વિચારપૂર્વક જોડાયેલું.', salonHours: 'નમૂનાનો સમય', hoursValue: '10:00–21:00 IST', sampleOpen: 'આ ઉદાહરણમાં ખુલ્લું', sampleClosing: 'ઓનલાઇન નોંધણી 20:30 સુધી',
   welcome: 'રાહ જોવાની વધુ સારી રીત', heroFirst: 'તમારો સમય.', heroSecond: 'તમારો વારો.', heroBody: 'નવો દેખાવ તમારા દિવસને અનુકૂળ હોવો જોઈએ. સેવાઓ અને વાળંદ પસંદ કરો અને પ્રતીક્ષા વિસ્તારમાં ઓછો સમય વિતાવો.', exploreJoin: 'જોડાવાનું પૂર્વાવલોકન', viewStatus: 'ટોકનનો નમૂનો જુઓ',

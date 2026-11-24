@@ -24,10 +24,10 @@ export function Badge({ state, children }: { state: TranslationKey; children?: R
   const Icon = state === 'onBreak' ? Coffee : state === 'available' ? Check : Clock3
   return <span className={`badge badge-${tone}`}><Icon size={13} aria-hidden="true" />{children ?? t(state)}</span>
 }
-export function Field({ label, hint, ...props }: InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string }) {
+export function Field({ label, hint, error, ...props }: InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string; error?: string }) {
   const generatedId = useId()
   const id = props.id ?? generatedId
-  return <div className="field"><label htmlFor={id}>{label}</label><input {...props} id={id} aria-describedby={hint ? `${id}-hint` : undefined} />{hint && <p id={`${id}-hint`} className="field-hint">{hint}</p>}</div>
+  return <div className="field"><label htmlFor={id}>{label}</label><input {...props} id={id} aria-invalid={!!error || props['aria-invalid']} aria-describedby={[hint && `${id}-hint`, error && `${id}-error`, props['aria-describedby']].filter(Boolean).join(' ') || undefined} />{hint && <p id={`${id}-hint`} className="field-hint">{hint}</p>}{error && <p id={`${id}-error`} className="field-error">{error}</p>}</div>
 }
 export function PageIntro({ eyebrow, title, description, action }: { eyebrow: string; title: string; description: string; action?: ReactNode }) {
   return <header className="page-intro"><div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p className="intro-copy">{description}</p></div>{action && <div className="intro-action">{action}</div>}</header>

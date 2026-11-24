@@ -402,3 +402,385 @@ Continuation message received during this task:
 Additional user instruction:
 
 > remember we have complete project before today night so work fast
+
+## Phase 3 authorization — 24 November 2026
+
+> # Phase 3 — Functional Customer Experience and Live Queue Tracking
+>
+> Phase 2.5 is approved and complete.
+>
+> Latest commit: d3c3b2f.
+>
+> Hosted Supabase has been activated, migrations applied, fictional salon data seeded, five staff accounts provisioned, and salonq-api deployed.
+>
+> Reported verification:
+>
+> - Hosted smoke tests: 27/27 PASS
+> - Database metadata checks: 14/14 PASS
+> - Automated tests: 41/41 PASS
+> - Build, lint and Edge type-check: PASS
+> - Sanitized realtime delivery: observed 1.94 seconds
+>
+> You are authorized to begin Phase 3 immediately.
+>
+> Act as a Senior Full-Stack React Developer, Supabase Integration Specialist, UI/UX Engineer and QA Engineer.
+>
+> ## 1. Review existing implementation
+>
+> Read:
+>
+> - AGENTS.md
+> - docs/01-brief.md
+> - docs/02-screens.md
+> - docs/03-flows-rules.md
+> - supabase/README.md
+>
+> Inspect the existing frontend components, domain types, Supabase services, Edge Function contracts, authentication infrastructure and realtime hooks.
+>
+> Reuse the implemented backend operations.
+>
+> Do not rebuild the database, repeat migrations, regenerate the React application or redesign the existing UI.
+>
+> ## 2. Scope
+>
+> Implement functional versions of only these three customer-facing screens:
+>
+> 1. Home — /
+> 2. Join Queue — /join
+> 3. My Status — /status/:id
+>
+> Preserve the SalonQ brand, premium charcoal/champagne-gold design, typography, digital queue pass and reusable components.
+>
+> Reception, Barber, TV and Owner screens will be connected in subsequent phases.
+>
+> ## 3. Home screen integration
+>
+> Replace fictional homepage statistics with authorized public Supabase data.
+>
+> Implement:
+>
+> - Actual salon name.
+> - Current opening and closing hours in IST.
+> - Open, closed and online-admission status.
+> - Actual waiting customer count.
+> - Estimated waiting time.
+> - Number of working or on-duty barbers, clearly labeled.
+> - Actual barber availability.
+> - Enabled service catalog with prices and durations.
+> - Functional Join Queue navigation.
+> - Existing customer status resume when a valid saved capability exists.
+> - Automatic data refresh through sanitized realtime signals.
+>
+> Disable online joining when admission is closed and explain the reason.
+>
+> Handle loading, empty, disconnected, unavailable-estimate and error states.
+>
+> Remove fictional preview labels from successfully connected sections.
+>
+> Never display mock statistics as live information.
+>
+> ### Targeted UI improvements
+>
+> - Reduce excessive hero whitespace.
+> - Bring actual salon availability and queue statistics closer to the top.
+> - Preserve the existing layered queue pass concept.
+> - Add a compact featured-services section using real catalog data.
+> - Improve information hierarchy without replacing the approved design.
+>
+> Any homepage example token must remain clearly marked as illustrative and must not link to another customer's private entry.
+>
+> ## 4. Join Queue integration
+>
+> Activate the existing customer form and service-selection components.
+>
+> Implement:
+>
+> - Customer name input.
+> - Indian mobile-number input and normalization.
+> - Optional +91 prefix.
+> - One to three distinct enabled services.
+> - Preferred barber selection.
+> - Any Barber option.
+> - Actual prices and service durations.
+> - Dynamic selection summary.
+> - Selected-services counter.
+> - Authoritative estimated waiting time.
+> - Clear confirmation action.
+> - Validation errors.
+> - Submission loading state.
+> - Duplicate-submission protection.
+> - Queue-closed handling.
+> - Disabled-service handling.
+> - Barber availability warnings.
+>
+> Preserve the existing two-column desktop layout and optimize the mobile experience.
+>
+> Use a clear three-step visual structure:
+>
+> 1. Your details.
+> 2. Select services.
+> 3. Choose barber and confirm.
+>
+> Do not unnecessarily rebuild the existing form into a complex wizard.
+>
+> Display warnings about barber breaks only when relevant.
+>
+> ## 5. Actual customer admission
+>
+> Connect the Confirm and Join Queue action to the existing secure admission operation.
+>
+> The backend must remain authoritative for:
+>
+> - Validation.
+> - Phone normalization.
+> - Service availability.
+> - Price and duration.
+> - Admission restrictions.
+> - Duplicate active entries.
+> - Token generation.
+> - Queue ordering.
+> - Tracking capability generation.
+>
+> Reuse the approved payload-bound idempotency and retry mechanism.
+>
+> Prevent duplicate entries caused by rapid clicks, network timeouts or uncertain submission responses.
+>
+> If service prices or durations change during submission, require the customer to review and reconfirm the updated selection.
+>
+> Do not expose another customer's status capability through duplicate-phone handling.
+>
+> After successful admission:
+>
+> - Display the actual generated token.
+> - Securely preserve the authorized customer tracking capability using the approved resume mechanism.
+> - Navigate to the actual private status route.
+> - Show appropriate success feedback.
+>
+> Do not include names or phone numbers in URLs.
+>
+> ## 6. My Status integration
+>
+> Replace the fictional status page with capability-authorized backend data.
+>
+> Display:
+>
+> - Actual queue token.
+> - Current status.
+> - Global or barber-eligible queue position.
+> - Estimated waiting time.
+> - Selected service snapshots.
+> - Total price.
+> - Total service duration.
+> - Preferred barber.
+> - Assigned barber when called.
+> - Realtime connection status.
+>
+> Support all documented states:
+>
+> - Waiting.
+> - Called.
+> - In Chair.
+> - Done.
+> - Cancelled.
+> - No-show.
+>
+> Handle invalid, expired or unavailable tracking capabilities without revealing private records.
+>
+> Restore authorized status after page refresh.
+>
+> Do not use a public queue token or phone number as authorization.
+>
+> ## 7. Premium tracking experience
+>
+> Preserve and enhance the existing digital queue pass.
+>
+> Implement:
+>
+> - Prominent gold token number.
+> - Elegant circular waiting-time visualization.
+> - Clearly labeled approximate estimate.
+> - Visual status progression.
+> - Arrival reminder when the customer reaches the documented position.
+> - Prominent Called notification displaying the assigned barber.
+> - Accessible live status announcements.
+> - Reduced-motion support.
+> - Copy Private Status Link action with an explanation that the link should remain private.
+>
+> Do not imply the estimated waiting time is a guaranteed countdown.
+>
+> Use an explicit unavailable or uncertain state when appropriate.
+>
+> Avoid sending tracking capabilities to analytics, logs, third-party services or referrer headers.
+>
+> ## 8. Customer cancellation
+>
+> Connect the existing cancellation action to the trusted backend operation.
+>
+> Requirements:
+>
+> - Only permit cancellation while Waiting.
+> - Show a confirmation dialog.
+> - Prevent repeated cancellation requests.
+> - Handle cancellation-versus-calling races correctly.
+> - Refetch authoritative status after a mutation.
+> - Display an appropriate terminal Cancelled state.
+> - Allow customers to return to Home.
+>
+> Do not merely change the status in React without persisting it through the backend.
+>
+> ## 9. Realtime synchronization
+>
+> Reuse the existing sanitized realtime infrastructure.
+>
+> Home and My Status must automatically refresh relevant data after backend changes.
+>
+> Handle:
+>
+> - Subscription initialization.
+> - Connection loss.
+> - Stale snapshots.
+> - Reconnection.
+> - Foregrounding.
+> - Duplicate events.
+> - Subscription cleanup.
+>
+> Do not subscribe anonymous clients to private queue records.
+>
+> Target synchronization within five seconds under normal connected conditions.
+>
+> Disable unsafe actions when necessary while authoritative state cannot be verified.
+>
+> Do not display a Live indicator unless the connection and data freshness justify it.
+>
+> ## 10. English and Gujarati
+>
+> Ensure every new customer-facing label and backend error message supports English and Gujarati.
+>
+> Verify:
+>
+> - Navigation.
+> - Service names.
+> - Input labels.
+> - Validation messages.
+> - Price and duration summaries.
+> - Queue status.
+> - Admission messages.
+> - Cancellation.
+> - Connection warnings.
+> - Empty and error states.
+>
+> Preserve centralized translations and the existing language preference mechanism.
+>
+> ## 11. Security requirements
+>
+> Maintain all approved Phase 2 security controls.
+>
+> Do not:
+>
+> - Disable RLS.
+> - Expose privileged credentials.
+> - Add unauthorized direct database writes.
+> - Allow phone-only private status retrieval.
+> - Use client-side logic as authoritative queue validation.
+> - Log customer tracking capabilities.
+> - Introduce fake success responses.
+> - Weaken operating-hour restrictions for testing.
+>
+> Keep .env.local ignored by Git.
+>
+> Use fictional test customers only.
+>
+> The public preview route may remain as an explicitly labeled sample, but it must be isolated from actual private tracking behavior.
+>
+> ## 12. Functional and visual verification
+>
+> Run applicable existing tests and add focused tests for the new customer integration.
+>
+> Actually verify:
+>
+> 1. Home loads live salon information.
+> 2. Enabled services load correctly.
+> 3. Barber availability loads correctly.
+> 4. Customer name and mobile validation work.
+> 5. Service selection supports one to three services.
+> 6. Price and duration summaries are correct.
+> 7. A valid customer receives a real unique token.
+> 8. Duplicate submissions do not create duplicate entries.
+> 9. Duplicate phone handling preserves privacy.
+> 10. Successful admission opens the correct private status page.
+> 11. Refresh preserves authorized customer tracking.
+> 12. Invalid tracking capabilities are rejected.
+> 13. Cancellation works while Waiting.
+> 14. Cancellation is rejected in invalid states.
+> 15. Queue-closed restrictions are enforced.
+> 16. Backend changes automatically refresh the customer screen.
+> 17. Called, In Chair and Done states render correctly.
+> 18. Realtime reconnection restores accurate data.
+> 19. English/Gujarati switching works.
+> 20. Mobile and desktop layouts remain usable.
+> 21. No privileged credentials or private customer information appear in public payloads.
+>
+> Use existing authorized backend test mechanisms to exercise status transitions before staff screens are connected.
+>
+> Respect previous browser-tool restrictions. If rendered checks are unavailable, report NOT RUN and provide manual test instructions rather than repeatedly attempting blocked tools.
+>
+> Run:
+>
+> - npm run build
+> - npm run lint
+> - npm run test
+>
+> Run relevant existing backend and hosted checks where appropriate.
+>
+> Report actual PASS, FAIL and NOT RUN results.
+>
+> Update acceptance scenario results only where corresponding behavior has actually been verified.
+>
+> ## 13. Git requirements
+>
+> Preserve existing commits and working functionality.
+>
+> Record this actual prompt in prompts.md if available.
+>
+> Commit the completed Phase 3 implementation with:
+>
+> feat: connect SalonQ customer experience to live Supabase queue
+>
+> Do not commit credentials, test capabilities or private artifacts.
+>
+> Do not push or deploy the frontend during this task.
+>
+> ## 14. Final report
+>
+> Provide:
+>
+> 1. Implemented customer functionality.
+> 2. Connected backend operations.
+> 3. UI improvements.
+> 4. Actual admission and tracking verification.
+> 5. Realtime verification.
+> 6. Security verification.
+> 7. Automated test results.
+> 8. Acceptance scenario results.
+> 9. Build and lint results.
+> 10. Changed files.
+> 11. Exact local testing instructions.
+> 12. Git commit hash.
+> 13. Remaining limitations.
+> 14. Readiness for staff dashboard integration.
+>
+> IMPORTANT:
+>
+> Start implementation immediately.
+>
+> Do not produce another lengthy planning-only response.
+>
+> Reuse the existing backend and frontend foundation.
+>
+> Prioritize successful customer admission, persistent private tracking and realtime updates over optional cosmetic changes.
+>
+> Complete Phase 3 and stop before implementing the staff dashboard screens.
+
+Continuation message:
+
+> continue

@@ -1,6 +1,6 @@
 import { publicEnvironment } from '../lib/env'
 import { getSupabaseClient, validPublicConfiguration } from '../lib/supabase'
-import type { AdmissionReceipt, AdmissionRequest, Json } from '../domain/database'
+import type { AdmissionReceipt, AdmissionRequest, CustomerEntry, PublicSalon, Json } from '../domain/database'
 
 export class BackendError extends Error {
   constructor(public readonly code: string, public readonly uncertain = false) { super(code); this.name = 'BackendError' }
@@ -18,20 +18,23 @@ export async function customerOperation<T>(action: 'public_snapshot' | 'admit' |
   let response: Response
   try {
     response = await fetch(`${publicEnvironment.supabaseUrl.replace(/\/$/, '')}/functions/v1/salonq-api`, {
-      method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer', signal,
+      method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
       headers: { 'content-type': 'application/json', apikey: publicEnvironment.supabasePublishableKey, ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) },
       body: JSON.stringify({ action, payload }),
     })
   } catch { throw new BackendError('NETWORK_UNCERTAIN', action === 'admit' || action === 'cancel') }
   let result: { data?: T; error?: string }
   try { result = await response.json() } catch { throw new BackendError('NETWORK_UNCERTAIN', action === 'admit' || action === 'cancel') }
-  if (!response.ok) throw new BackendError(result.error ?? 'BACKEND_UNAVAILABLE', response.status >= 500 && action === 'admit')
-  if (result.data === undefined) throw new BackendError('BACKEND_UNAVAILABLE', action === 'admit')
+  if (!response.ok) throw new BackendError(result.error ?? 'BACKEND_UNAVAILABLE', response.status >= 500 && (action === 'admit' || action === 'cancel'))
+  if (result.data === undefined) throw new BackendError('BACKEND_UNAVAILABLE', action === 'admit' || action === 'cancel')
   return result.data
 }
 
 export const admitCustomer = (request: AdmissionRequest, signal?: AbortSignal) => customerOperation<AdmissionReceipt>('admit', request, signal)
 export const recoverAdmission = (request_key: string, capability: string) => customerOperation<AdmissionReceipt>('receipt', { request_key, capability })
+export const getPublicSalon = (signal?: AbortSignal) => customerOperation<PublicSalon>('public_snapshot', {}, signal)
+export const getCustomerStatus = (access: { locator: string; capability: string }, signal?: AbortSignal) => customerOperation<CustomerEntry>('status', access, signal)
+export const cancelCustomerEntry = (access: { locator: string; capability: string }) => customerOperation<CustomerEntry>('cancel', access)
 
 export async function staffOperation(action: string, payload: Json = {}) {
   const { data, error } = await getSupabaseClient().rpc('salonq_staff_command', { action, payload })
