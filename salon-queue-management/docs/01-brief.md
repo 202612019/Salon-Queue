@@ -1,6 +1,6 @@
 # SalonQ — Project Brief & Scope
 
-**Version:** 1.3 | **Stage:** Phase 1 frontend foundation implemented; backend functionality remains unimplemented. The user approved the desktop Home, Join Queue and My Status design foundation after manual review at `http://127.0.0.1:5174/`. Other screens, exact viewport sizes and Gujarati layouts are not visually verified. See the application README for automated verification results and `02-screens.md` for deferred targeted refinements.
+**Version:** 1.4 | **Stage:** Phase 2 backend foundation source implemented with local verification; hosted migrations, Edge deployment, staff provisioning and end-to-end integration remain pending. The frontend remains the approved read-only Phase 1 preview. The user approved the desktop Home, Join Queue and My Status design foundation after manual review at `http://127.0.0.1:5174/`. Other screens, exact viewport sizes and Gujarati layouts are not visually verified. See the application README and `supabase/README.md` for verification/setup, and `02-screens.md` for deferred targeted refinements.
 
 **Canonical project:** `D:/My Folder/Salon Queue/Salon-Queue/salon-queue-management`, inside the existing `Salon-Queue` Git checkout. These four documents are the sole implementation source of truth. The unchanged pre-Phase-0 reviewed set is archived outside Git at `../../planning-backups/2026-11-24-phase0-reviewed/`; archived copies are not active requirements. **College deadline:** 24 November 2026, 11:59 PM IST. Deliver the functional, secure MVP through small tasks; avoid unnecessary research and dependencies.
 
@@ -84,7 +84,7 @@ Customers read/cancel only their own capability-authorized entry, with cancellat
 
 ## Planned application structure
 
-Phase 1 implements the frontend directories below, route shells, shared components, local fonts and tests. Supabase backend directories, migrations and live operations remain future work. Preview fixtures are fictional, and staff preview pages grant no authenticated access. No queue operation can succeed in this phase.
+Phase 1 implements the frontend directories below, route shells, shared components, local fonts and tests. Phase 2 adds the Supabase schema, operations, Edge boundary and client service helpers; applying/deploying these to the user's project still requires hosted setup. Screen integration remains future work. Preview fixtures are fictional, and staff preview pages grant no authenticated access. No queue operation succeeds through the preview UI.
 
 ```text
 salon-queue-management/
@@ -100,7 +100,7 @@ salon-queue-management/
     i18n/                    centralized English/Gujarati dictionaries
     styles/
   supabase/
-    migrations/              future schema, constraints, RLS and RPCs
+    migrations/              schema, constraints, RLS and controlled RPCs
     functions/               minimal trusted public/customer boundary
     tests/                   authorization, transactions and concurrency
   tests/e2e/

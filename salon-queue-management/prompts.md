@@ -190,3 +190,19 @@ The next user instructions were, in order:
 > Report the commit hash, actual test results, remaining limitations and readiness for Phase 2.
 >
 > Stop after closing Phase 1.
+
+## Phase 2 authorization — 24 November 2026
+
+> I have successfully created the Supabase project and configured VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in the .env.local file inside the canonical application directory.
+>
+> Verify the environment configuration without printing credentials. Ensure .env.local is ignored by Git and .env.example contains only placeholders.
+>
+> Proceed with the approved Phase 2 implementation. If database migrations or Edge Function deployment require additional authorization or manual configuration, provide exact instructions.
+>
+> Do not expose privileged credentials or modify the existing frontend design unnecessarily.
+>
+> Start implementation now.
+
+Continuation message received during this task:
+
+> continue
