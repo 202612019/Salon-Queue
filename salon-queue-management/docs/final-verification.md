@@ -1,4 +1,96 @@
-# SalonQ — Final production verification
+# SalonQ — Final acceptance testing and visual audit
+
+**Latest review: 24 November 2026, IST.** Production: [SalonQ](https://salon-queue-snowy.vercel.app/). Repository: [202612019/Salon-Queue](https://github.com/202612019/Salon-Queue). Profile: [202612019](https://github.com/202612019).
+
+## Latest acceptance result
+
+**81 PASS / 0 FAIL / 10 NOT RUN**, individually mapped in [acceptance-evidence.md](acceptance-evidence.md). “0 FAIL” is the final status after correcting and retesting the reproduced session-revocation defect; the initial failure is documented below. A PASS includes its verification environment and may combine isolated PostgreSQL and React/jsdom evidence. It is not a claim that every case ran in a rendered production browser.
+
+The exact remaining cases are **T31, T32, T33, T38, T39, T52, T72, T81, T83 and T91**. Their reasons/procedures are listed below and in the ledger. T72 was changed from the old PASS to NOT RUN: testing immutable snapshots in SQL alone did not establish its complete “refresh all views” wording. The other original scenario text and expected outcomes are preserved; the new coverage is evidence-based, not sequentially filling checkboxes.
+
+## Fresh executed checks
+
+| Check | Actual result | Environment / scope |
+|---|---|---|
+| Frontend suite | **PASS — 140 tests, 9 files** | Final command: npm test -- --maxWorkers=2 --testTimeout=15000 --reporter=dot; 80.64 seconds. Controlled React/jsdom/SDK and Edge-handler boundaries |
+| Expanded SQL suite | **PASS — 167 assertions** | npm run test:sql -- --acceptance; disposable real PostgreSQL, test-only Auth/clock; includes 74 baseline + 93 added assertions, not 167 acceptance scenarios |
+| Independent database/concurrency suite | **PASS — 45 checks** | Original 37 plus eight lock-coordinated admission/configuration races on separate connections; disposable cluster only |
+| Lint | **PASS** | Zero errors/warnings after final test changes |
+| Production build | **PASS** | TypeScript/Vite; main JS 144.81 kB / 36.99 kB gzip, CSS 59.07 kB / 11.60 kB gzip; no chunk-size warning |
+| Edge type check | **PASS** | Deno checked the current salonq-api handler |
+| Environment | **PASS — 7 flags** | Local URL/key valid; no privileged frontend vars; local environment ignored/untracked; examples placeholders |
+| Hosted security metadata | **PASS — 17 safeguards** | After additive session migration; RLS, grants, private transaction implementation, sanitized publication and session guard retained |
+| Hosted actual refresh/revocation proof | **PASS** | Fresh demo session only; forced client-side expiry caused a real Auth refresh request; valid protected read succeeded; logout then denied saved signed JWT to profile/snapshot and Edge walk-in |
+| Production HTTP/CORS | **PASS — 16 checks** | Home, nine direct nested/unknown routes, deployed public environment/Owner/TV markers, exact CORS/preflight, safe public snapshot; 21:22 IST after backend correction |
+| New full hosted React rerun | **NOT RUN — blocked before execution** | Automatic approval review failed because of account usage limit; no attempt to bypass the review |
+| Earlier hosted lifecycle/navigation evidence | **REVIEWED, not freshly rerun** | 19 production-backed React checkpoints, five-client admission/status timings, 17 Phase 4 / 10 Phase 5 checkpoints retain their explicitly earlier scope |
+| Rendered visual QA | **PARTIAL** | Actual native Chrome captures of Home, 390×844 Join, and partial Reception; complete matrix remains NOT RUN. See visual-audit.md |
+
+The first enlarged frontend run encountered a 5-second test timeout on this machine. New catalog tests also exposed an ambiguous duplicate-text assertion and queued one-off mock responses leaking after that assertion failed. The assertion now queries all matching messages, each test resets mock queues, and the final 140-test run passed with two workers and a 15-second per-test budget. These were test-harness failures, not silently relabelled product successes. No application dependency or architecture was changed.
+
+## Actual defect corrected: revoked staff JWT still read protected data
+
+The initial hosted probe created a fresh Reception demo session, fetched no customer body into logs, signed out **only that session**, and tried its saved access token against the protected snapshot RPC. It returned **HTTP 200 and a protected snapshot** despite logout. This violated the project's current-session/revocation requirement. No customer record or other user's session was modified.
+
+Supabase documents that signed access tokens remain valid until JWT expiry after logout and recommends checking the signed session_id against auth.sessions for immediate revocation-sensitive operations: [Auth sessions](https://supabase.com/docs/guides/auth/sessions), [sign-out behavior](https://supabase.com/docs/guides/auth/signout). This documentation explained the reproduced result; it was not used as a substitute for testing.
+
+Additive migration **20261124000500_staff_session_revocation.sql**, tracked in fix commit **264d21d**, now checks that the verified JWT's session belongs to the current actor and remains present/not expired before profile or staff RPC access, including receipt retries. The existing role/linkage facade and transaction body are unchanged. A service-only boolean session checker supports the existing Edge walk-in flow after Auth verifies the JWT; the public body cannot select an actor/session. The helper is not executable by anon/authenticated roles. RLS/grants/hours/private tracking remain intact.
+
+The migration passed local tests before application to the existing hosted project. The existing Edge Function was redeployed with the stricter session check; CORS allowlist and credentials were preserved. After correction:
+
+- A real refresh-token endpoint request from the SDK succeeded and protected snapshot read was permitted.
+- The newly signed-out JWT was denied by snapshot/profile RPCs (**AUTH_REQUIRED**, HTTP 400 from the existing RPC error convention).
+- The signed-out JWT was denied by the Edge walk-in boundary (**AUTH_REQUIRED**, HTTP 401), before any admission.
+- Local tests additionally deny cross-user session IDs, missing/revoked/expired sessions and unauthorized access to the service-only helper; valid restored test session still works.
+- React tests verify failed refresh/session-loss clears protected caches and returns to sign-in; real two-rendered-tab propagation remains T52 NOT RUN.
+
+An initial hosted metadata check also stopped on an obsolete “exactly three enabled services” assertion because the live catalog had legitimately changed to four. No service was re-enabled/deleted. The read-only audit now validates the authoritative catalog bounds instead of a mutable seed count, and all 17 safeguards passed. This was an audit assumption defect, not a catalog failure.
+
+## Reported Add Walk-in issue
+
+At 21:22 IST production returned **SALON_CLOSED**, online=false and walk_in=false, under the configured 10:00–21:00 salon hours. Reception intentionally disables Add Walk-in from that server flag and shows the hours/reason. This is expected behavior after closing, not a broken click handler. Local regression checks now establish both conditions: disabled with explanation after closing, and enabled/openable during the online cutoff while walk-ins are still allowed. No operating hours or customer records were changed to force success. The student should demonstrate actual admission during permitted hours; there is no authorized exception to the closing rule.
+
+## Original college requirements comparison
+
+Read the original **Salon Queue Management Vibe Coding Guide**, pages 1–9, and compared the four canonical planning files, all three phase verification reports and current test sources. The seven-screen/four-role MVP, bilingual services, live private tracking, preference-aware shared queue, walk-ins, Call Next, no-show, Barber Start/Done/break, public TV and Owner catalog/duty/settings/statistics are implemented. No missing core college workflow was identified by this review. Approved decisions intentionally use Supabase Auth instead of a public test PIN, private capability tracking instead of phone-only recovery, initials avatars rather than unlicensed photos, and approximate wait visualization rather than a guaranteed countdown. No OTP/SMS is required or implemented.
+
+Two **noncritical presentation gaps** remain against the expanded canonical screen descriptions: TV does not explicitly show a closed-hours/online-pause note alongside its valid existing queue, and Owner shows the manual online switch/cutoff times rather than a separate authoritative effective-admission reason. Home/Join/Reception correctly expose server eligibility, and backend restrictions are enforced. These are disclosed rather than redesigned during this critical-defect-only final task.
+
+Submission evidence gaps: a three-minute **demo script is not the required recorded video**; no tracked video artifact was found or independently verified. The student must record/submit it, privately supply evaluator passwords and personalize/approve the reflection draft. The original README-only first commit history exception is already disclosed; history was not rewritten to conceal it.
+
+## Rendered audit and exact remaining manual work
+
+See [visual-audit.md](visual-audit.md) for the observed regions, viewport matrix and precise Chrome procedure. Native screenshot control became available, but the browser provider remained unavailable. The user interacted with the native window during inspection; control was left with the user. No screenshots were saved as standalone files. No complete Gujarati/layout/keyboard/contrast/console approval is claimed from partial captures or the user's general “checked” report.
+
+| Scenario | Why final result remains NOT RUN | Completion procedure |
+|---|---|---|
+| T31 | No simultaneous measured Reception + TV + customer Start/Done rendered latency | Use your own new fictional entry during real hours; show all screens together and record each transition/time |
+| T32 | Five independent clients are not two physical devices | Open deployed app on phone plus another device, operate only your own fixture and observe persistence without refresh |
+| T33 | Event simulation did not sever real network transport | DevTools Offline → verify stale/disabled state → restore network → confirm fresh state before actions |
+| T38 | DOM translations do not prove every rendered label/state is unclipped | Inspect all screens and dialogs in Gujarati at the requested sizes |
+| T39 | Full eight-route/four-viewport matrix incomplete | Follow visual-audit.md and record each viewport individually |
+| T52 | Backend revocation now passes, but two rendered shared-session tabs were not tested | Sign in one demo session in two tabs; sign out one; verify both remove protected content and old requests reject |
+| T72 | SQL immutable snapshots pass; refresh of all views/new joins together not tested | In an isolated/staging fixture, edit/disable booked service, refresh all required views, compare historical snapshots and new catalog; restore via legitimate operations |
+| T81 | Application transport/storage tests do not inspect all hosting/API logs/referrers | Authorized operator inspects redacted Vercel/Supabase logs, browser referrers/storage/network; never publish private bodies/headers |
+| T83 | 320px Gujarati keyboard/focus/target/contrast audit incomplete | Keyboard-only forms/dialogs, 200% zoom, measured 44px targets and contrast at 320px Gujarati |
+| T91 | Counters/429 branches pass separately; full public limit-exhaustion sequences were not executed | Use isolated staging gateway backed by real counters; exceed join/status budgets and verify generic 429 with no extra writes/data; do not flood production |
+
+## Git, publication and current deployment status
+
+The production Supabase session migration and existing Edge deployment **completed successfully before** the later approval-review failure. A post-correction production HTTP/CORS smoke test passed. The frontend was not redesigned and no new dependency was installed. The earlier Vercel release a6a99f2 was previously byte-matched; final publication of the new tracked backend source/tests/report is a separate step and must not be inferred from that older asset proof.
+
+Automatic approval review then failed before the new full hosted React run because the account usage limit was reached. The tool explicitly stated this was a **review failure, not an unsafe-action determination**, and prohibited bypassing the check. No alternative tool/credential/transport was used to perform the denied action. Local tests, documentation and preparation continued. Pending remote actions and the exact final commit are reported in the final response; do not claim a fresh push or Vercel redeploy unless it is observed.
+
+The user's pre-existing whitespace-only repository-root vercel.json change remains untouched and excluded. Local environments, DPAPI vault, test artifacts, dependencies and dist output remain ignored/untracked. No staff passwords, privileged credentials or customer tracking capabilities are included in the report or commit. All test clock/Auth/concurrency/destructive operations ran only in marker-checked disposable local databases. This final task created **no production customers** and altered no pre-existing customer; test Auth sign-out affected only newly created probe sessions.
+
+**Readiness:** the operational college demo has broad functional evidence and a corrected revocation boundary; it is not 100% verified. Complete the listed rendered/device/logging checks and student submission materials before claiming every requirement passed.
+
+---
+
+## Earlier production integration review — historical evidence only
+
+The following report is retained as the 19:47 IST baseline. Its 34/57 totals and 122/67/37 counts describe that earlier review and are superseded by the latest results above. Its previous publication proof applies to the prior fix commit only.
+
 
 Verified on **24 November 2026 (IST)**. Production: [SalonQ](https://salon-queue-snowy.vercel.app/). Repository: [202612019/Salon-Queue](https://github.com/202612019/Salon-Queue). Profile: [202612019](https://github.com/202612019).
 

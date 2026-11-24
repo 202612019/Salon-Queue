@@ -1,5 +1,7 @@
 # Phase 3 verification — 24 November 2026
 
+> Historical phase report. Current acceptance totals, session-revocation correction and coverage limitations are in [final-verification.md](final-verification.md). Earlier phase counts and scope below are retained as historical evidence.
+
 This is an implementation/QA record, not a replacement planning specification. Only Home `/`, Join `/join` and private My Status `/status/:id` are connected. Reception, Barber, Display, Owner and staff Login remain explicitly fictional previews. No frontend deployment or push was performed.
 
 ## Delivered behavior

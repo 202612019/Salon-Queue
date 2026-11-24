@@ -1,5 +1,7 @@
 # Phase 5 verification — 24 November 2026
 
+> Historical phase report. Current acceptance totals, session-revocation correction and coverage limitations are in [final-verification.md](final-verification.md). Earlier phase counts and scope below are retained as historical evidence.
+
 Phase 5 completes the functional activation of **Waiting Area TV** (`/display`, with `/tv` as an alias redirect) and **Owner Settings** (`/admin`). All seven screens of SalonQ — Smart Salon Queue Management are now fully operational and connected to hosted Supabase with end-to-end realtime synchronization via the sanitized change signal table (`salonq_changes`).
 
 All previous customer-facing features (Home, Join Queue, private My Status), staff authentication, Reception Dashboard, and Barber Workspaces remain 100% operational with verified regression safety.

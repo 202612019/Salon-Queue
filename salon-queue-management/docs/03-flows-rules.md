@@ -1,6 +1,6 @@
 # SalonQ — Flows & Rules
 
-**Stage:** Phases 4–6 are implemented and the Vercel production application is connected to the existing Supabase project. The 24 November independent verification reran 122 frontend tests, 67 isolated SQL assertions, 37 database/concurrency checks, 19 production-backed React/jsdom checkpoints, and a five-customer HTTP/WebSocket queue audit. Rendered viewport, clipping, physical-device and audible sound checks remain NOT RUN. See `final-verification.md`; the functional requirements below are unchanged.
+**Stage:** Final acceptance audit: 81 PASS, 0 FAIL, 10 NOT RUN, individually evidenced in `docs/acceptance-evidence.md` (or `acceptance-evidence.md` from this docs directory). Current local checks: 140 frontend tests, 167 isolated SQL assertions including acceptance extensions, 45 database/concurrency checks. Hosted refresh/revocation and production HTTP/CORS retested; full rendered matrix and a fresh hosted React rerun remain incomplete. See `final-verification.md` and `visual-audit.md`. Functional requirements below are unchanged.
 
 ## 1. Main workflows
 **Remote customer:** Home → Join → enter name/phone → select 1–3 services and barber/Any → confirm → receive unique token and private tracking access → watch position and estimated wait → arrival reminder at position 2 → reception calls → assigned barber starts service → barber completes → terminal status.
@@ -178,99 +178,99 @@ All items initially unchecked. During QA record actual PASS, FAIL or NOT RUN wit
 
 | ID | Scenario | Expected outcome | Result |
 |---|---|---|---|
-| T01 | Join with name, valid phone, one service | Token and private tracking created | [x] PASS — hosted React/jsdom, Phase 3 |
-| T02 | Invalid phone or missing name | Rejected with clear validation | [x] PASS — client-side validation + backend INVALID_PHONE SQL assertion, Phase 6 |
-| T03 | Select zero or four services | Confirm blocked and backend rejects | [x] PASS — client-side limit + backend INVALID_SERVICES SQL assertion, Phase 6 |
-| T04 | Select two services | Correct combined price and duration | [x] PASS — hosted React/jsdom, Phase 3 |
-| T05 | Tamper with client price | Trusted service price used or rejected | [x] PASS — authoritative price used + CATALOG_CHANGED SQL assertion, Phase 6 |
-| T06 | Same phone joins twice | One active entry; no private data leak | [x] PASS — actual hosted rejection + component message, Phase 3 |
-| T07 | Concurrent joins/repeated confirm | Unique tokens; no duplicate entry for same phone | [ ] |
-| T08 | Refresh active status | Same entry and current state | [ ] |
-| T09 | Add walk-in after remote join | Walk-in goes to tail of same queue | [x] PASS — hosted React/jsdom walk-in tail, Phase 4 |
-| T10 | Amit calls with Ravi-only entry first | Earliest Amit/Any entry selected | [x] PASS — hosted React/jsdom eligible Amit selection, Phase 4 |
-| T11 | No eligible entry | No assignment; clear feedback | [x] PASS — clear feedback and no-op assignment verified in unit test, Phase 6 |
-| T12 | Concurrent calls for same barber | Only one active assignment | [ ] |
-| T13 | Two barbers call one Any entry | Entry assigned at most once | [ ] |
-| T14 | Waiting → Called → In Chair → Done | All allowed transitions persist | [x] PASS — hosted React/jsdom persisted staff lifecycle, Phase 4 |
-| T15 | Attempt invalid/backward transition | Backend rejects | [x] PASS — INVALID_TRANSITION verified across multiple lifecycle points in SQL assertions, Phase 6 |
-| T16 | Cancel while Waiting | Terminal; queue recalculates | [x] PASS — hosted React/jsdom cancellation and public zero-Waiting read, Phase 3 |
-| T17 | Cancel after Called | Rejected | [x] PASS — hosted request rejected; mounted Called screen has no cancel action, Phase 3 |
-| T18 | No-show before ten minutes | Rejected | [x] PASS — hosted React/jsdom early No-show disabled and server rejected, Phase 4 |
-| T19 | No-show at/after ten minutes | Terminal; barber released | [ ] |
-| T20 | Re-add no-show | New token at end | [ ] |
-| T21 | Barber on break | No assignment; preference warning | [ ] |
-| T22 | Break/off-duty while occupied | Rejected | [x] PASS — BARBER_BUSY SQL assertion and hosted barber test break disabled, Phase 6 |
-| T23 | 90 min ahead, 3 working barbers, no active workload | Approx. 30 min | [ ] |
-| T24 | No working barbers | Wait unavailable, not zero | [x] PASS — zero working barbers results in unavailable estimate in SQL assertion, Phase 6 |
-| T25 | Earlier customer finishes | Estimate/position recompute | [ ] |
-| T26 | At 20:30 with 21:00 closing | Online join blocked | [ ] |
-| T27 | Walk-in during online cutoff | Accepted during open hours if on-duty barber exists | [ ] |
-| T28 | Owner manually closes online queue | Home/Join and backend block online join | [x] PASS — UI confirmation modal + walk-in bypass SQL assertion, Phase 6 |
-| T29 | Service disabled during selection | Rejected or asked to revise; old booking unchanged | [ ] |
-| T30 | Customer becomes second then Called | Arrival banner then turn alert | [ ] |
-| T31 | Start/Done in barber view | Reception, TV and customer update within target | [ ] |
-| T32 | Two devices with deployed app | Shared persistent state, no manual refresh | [ ] |
-| T33 | Disconnect/reconnect | Stale warning then resync | [ ] |
-| T34 | Anonymous/incorrect-role staff request | Backend denies restricted data/actions | [x] PASS — FORBIDDEN and 42501 verified across SQL assertions and hosted role tests, Phase 6 |
-| T35 | Wrong barber attempts Start/Done | Denied | [x] PASS — FORBIDDEN verified in hosted barber test and SQL assertion, Phase 6 |
-| T36 | Inspect TV/public requests | No phone, customer name or private credential exposed | [x] PASS — zero customer PII in public TV display, DOM and network verified in unit and hosted Supabase, Phase 5 |
-| T37 | Invalid tracking link | Generic error; no customer details | [ ] |
-| T38 | Toggle Gujarati on every route | All labels/messages translate without clipping | [ ] |
-| T39 | Phone/tablet/TV layouts | Readable, no overflow, usable controls | [ ] |
-| T40 | Owner stats with known sample data | Correct counts and mean wait | [x] PASS — owner statistics computed strictly today in IST with mean wait verified in unit and hosted snapshot, Phase 5 |
-| T41 | Production build and direct nested route refresh | Build succeeds; deployed route opens | [x] PASS — Vite production build succeeds with code splitting + vercel.json SPA rewrites, Phase 6 |
-| T42 | Attempt remote and walk-in admission at 09:59:59 for 10:00 opening | Both rejected using server time; no entry created | [ ] |
-| T43 | Admit at exactly 10:00:00 with all other conditions valid | Both sources permitted; server timestamps and order recorded | [ ] |
-| T44 | Remote admission at 20:29:59 versus 20:30:00 for 21:00 closing | Serialized server decision permits first and rejects second; delayed response does not change admission time | [ ] |
-| T45 | Remote and walk-in admission at exactly 21:00:00 | Both rejected; existing active entries remain valid | [ ] |
-| T46 | Walk-in at 20:59:59 while manual online switch is off | Accepted if server admission decision precedes closing and other conditions hold | [ ] |
-| T47 | Authorized No-show request at 599 seconds Called | Rejected, remains Called and barber occupied | [ ] |
-| T48 | Authorized No-show request at exactly 600 seconds Called | Accepted once if still Called; barber released | [x] PASS — No-show allowed at exactly 600s in SQL assertion and UI unit test, Phase 6 |
-| T49 | Customer or wrong-role staff requests No-show after 600 seconds | Denied regardless of elapsed time | [ ] |
-| T50 | Staff access token expires but refresh succeeds | Valid session continues without exposing data or repeating mutations | [ ] |
-| T51 | Session refresh fails or staff session is revoked | Protected cache cleared, mutations blocked, same route presents sign-in | [ ] |
-| T52 | Sign out with another staff tab open | Protected data disappears in both tabs; stale requests cannot mutate | [ ] |
-| T53 | Attempt public staff signup or self-update role/barber linkage | No public provisioning; privilege escalation denied by backend | [x] PASS — publicSignupDisabled in hosted probe + FORBIDDEN SQL assertion, Phase 6 |
-| T54 | Anonymous request reads private tables or arbitrary queue fields | RLS/grants deny raw access; only explicit safe projections are available | [x] PASS — RLS on all private tables and 42501 verified in SQL assertions, Phase 6 |
-| T55 | Public client reads/subscribes or writes the realtime signal | Signal contains only version/time; unauthorized writes denied; no PII event | [x] PASS — anonymous signal read allowed, sanitized payload only, unauthorized writes denied, Phase 6 |
-| T56 | Admission commits but response is lost, then identical retry | Original token/locator returned with matching capability; one entry only | [x] PASS — lost-response receipt recovery verified in unit and SQL assertions, Phase 6 |
-| T57 | Reuse admission key with different phone, selection, preference, source or capability | Payload-binding conflict; no second entry and no private result leaked | [x] PASS — IDEMPOTENCY_CONFLICT verified in SQL assertions, Phase 6 |
-| T58 | Two simultaneous identical admissions with one key | One receipt, one entry, one token; both matching requests reconcile to it | [ ] |
-| T59 | Retry a successful admission after cutoff or a catalog edit | Original receipt returned; no new admission or reinterpretation of payload | [ ] |
-| T60 | Refresh after an uncertain admission with saved opaque pending credentials | Protected receipt resolves committed entry; no phone/name cache or duplicate | [ ] |
-| T61 | Owner changes selected service price before admission commit | Stale request rejected without entry; new total needs explicit reconfirmation | [ ] |
-| T62 | Owner changes selected service duration before admission commit | Stale request rejected; reviewed new duration requires a new bound request | [ ] |
-| T63 | All on-duty barbers are on break during otherwise valid admission | Remote/walk-in allowed; wait unavailable and break warnings shown | [ ] |
-| T64 | Choose a named on-duty barber on break, then try Call Next | Join allowed with warning; no assignment until that barber returns Available | [ ] |
-| T65 | No barber is on duty, even with empty queue and online switch on | Both admission sources blocked; estimate unavailable, never zero | [ ] |
-| T66 | Ongoing service reaches or exceeds booked duration without Done | Relevant wait becomes uncertain/overrun; no rolling five-minute promise | [ ] |
-| T67 | Waiting queue is empty but every eligible barber is occupied | Estimate includes current work or uncertainty; does not falsely show zero | [ ] |
-| T68 | Named barber has earlier Any and named entries while other barbers work | Filtered position and single-barber estimate follow documented rules | [ ] |
-| T69 | Cancellation and Call Next race on one Waiting entry | Exactly one valid transition wins; losing client reconciles current state | [ ] |
-| T70 | Start and eligible No-show race on one Called entry | Exactly one succeeds; no simultaneous In Chair and No-show or lost capacity | [ ] |
-| T71 | Retry successful Call Next after its customer has completed | Original result returned; retry never calls a second customer | [x] PASS — Call Next retry after completion verified in SQL assertion, Phase 6 |
-| T72 | Edit/disable a booked service after admission and refresh all views | Historical EN/GU names, price and duration unchanged; new joins use new catalog | [x] PASS — old entry retains catalog snapshots and catalog edit increments version in SQL assertion, Phase 6 |
-| T73 | Same mobile entered with spaces, hyphens, +91 or ten-digit form | All normalize identically and share active-phone uniqueness | [ ] |
-| T74 | Submit another country code, letters, leading zero or malformed length | Rejected consistently by client/backend with translated errors | [ ] |
-| T75 | Active entry crosses closing and midnight, then same phone joins again | Existing entry/link/order survive; duplicate active admission rejected | [ ] |
-| T76 | New admission after midnight on the next open day | Token sequence continues without reset; unresolved earlier eligible entries retain priority | [ ] |
-| T77 | Customer joins yesterday and completes today; compare IST/browser dates | Counts and mean use today's IST completion date and actual join-to-call interval | [ ] |
-| T78 | Terminal link used just before and exactly 24 hours after terminal_at | Before expiry permitted; at expiry denied generically; records/stats retained | [ ] |
-| T79 | Active link is older than 24 hours or crosses multiple midnights | Remains valid while active; no age-based interruption | [ ] |
-| T80 | Supply locator/token/phone without the matching private capability | No private response or cancellation; generic denial and bounded attempts | [ ] |
-| T81 | Inspect hosting/API logs, referrers, errors, storage and browser requests | Capability absent from path/query/logs/referrers; only opaque resume data stored; private responses no-store | [ ] |
-| T82 | Attempt direct edits of status, totals, snapshots, tokens or timestamps | Restricted grants/RPC checks deny bypasses; no client-authoritative values | [ ] |
-| T83 | Keyboard-only forms/dialogs and 320px Gujarati layouts | Labels, focus, 44px targets, contrast and wrapping remain usable | [ ] |
-| T84 | TV receives duplicate Called events, reconnects or audio permission is denied | Visual remains complete; one new-call chime at most; no historical replay | [x] PASS — TV display visual complete, audio toggle and duplicate call deduplication verified, Phase 5 |
-| T85 | Admission races with hours/switch/catalog/duty changes | Transaction serialization/recheck yields one consistent eligible outcome | [ ] |
-| T86 | Owner takes barber Off Duty with specific Waiting entries or active assignment | Rejected; preferences and current assignment preserved | [x] PASS — BARBER_HAS_WAITING and BARBER_BUSY verified in SQL assertions, Phase 6 |
-| T87 | Two owners save different versions of the same settings/service | Stale save rejected with review guidance; no silent lost update | [x] PASS — version-checked owner settings save and stale version rejection verified in offline SQL, Phase 5 |
-| T88 | Waiting duration is exactly 60 minutes, then exceeds 60 minutes | No long-wait highlight at equality; highlight/text appear only above threshold | [x] PASS — server-offset duration strictly highlights after 60 minutes verified in unit test, Phase 5 |
-| T89 | Browser clock is advanced to unlock cutoff or No-show | Server checks remain authoritative; spoofed timers cannot authorize changes | [ ] |
-| T90 | Catalog form has missing GU name, fractional/zero duration or invalid price | Shared exact bounds enforced by backend; valid zero price remains permitted | [ ] |
-| T91 | Public join/status attempts exceed configured rate limits | Server returns bounded generic rate-limit response; no extra entries or data leakage | [ ] |
+| T01 | Join with name, valid phone, one service | Token and private tracking created | [x] PASS — Prior hosted React + rerun component/SQL tests; [scenario evidence](acceptance-evidence.md) |
+| T02 | Invalid phone or missing name | Rejected with clear validation | [x] PASS — Local React/jsdom + PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T03 | Select zero or four services | Confirm blocked and backend rejects | [x] PASS — Local React/jsdom + PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T04 | Select two services | Correct combined price and duration | [x] PASS — Prior hosted React + rerun component/SQL tests; [scenario evidence](acceptance-evidence.md) |
+| T05 | Tamper with client price | Trusted service price used or rejected | [x] PASS — Local React/jsdom + PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T06 | Same phone joins twice | One active entry; no private data leak | [x] PASS — Prior hosted React + rerun component/SQL tests; [scenario evidence](acceptance-evidence.md) |
+| T07 | Concurrent joins/repeated confirm | Unique tokens; no duplicate entry for same phone | [x] PASS — Local independent PostgreSQL connections + React + prior production HTTP; [scenario evidence](acceptance-evidence.md) |
+| T08 | Refresh active status | Same entry and current state | [x] PASS — Local React/jsdom + prior hosted active remount; [scenario evidence](acceptance-evidence.md) |
+| T09 | Add walk-in after remote join | Walk-in goes to tail of same queue | [x] PASS — Prior hosted React + current local regressions; [scenario evidence](acceptance-evidence.md) |
+| T10 | Amit calls with Ravi-only entry first | Earliest Amit/Any entry selected | [x] PASS — Prior hosted React + current local regressions; [scenario evidence](acceptance-evidence.md) |
+| T11 | No eligible entry | No assignment; clear feedback | [x] PASS — Local React/jsdom + independent PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T12 | Concurrent calls for same barber | Only one active assignment | [x] PASS — Local PostgreSQL, independent connections; [scenario evidence](acceptance-evidence.md) |
+| T13 | Two barbers call one Any entry | Entry assigned at most once | [x] PASS — Local PostgreSQL, independent connections; [scenario evidence](acceptance-evidence.md) |
+| T14 | Waiting → Called → In Chair → Done | All allowed transitions persist | [x] PASS — Prior hosted React + current local regressions; [scenario evidence](acceptance-evidence.md) |
+| T15 | Attempt invalid/backward transition | Backend rejects | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T16 | Cancel while Waiting | Terminal; queue recalculates | [x] PASS — Local PostgreSQL + React + prior production multi-client audit; [scenario evidence](acceptance-evidence.md) |
+| T17 | Cancel after Called | Rejected | [x] PASS — Prior hosted React + current local regressions; [scenario evidence](acceptance-evidence.md) |
+| T18 | No-show before ten minutes | Rejected | [x] PASS — Prior hosted React + current local regressions; [scenario evidence](acceptance-evidence.md) |
+| T19 | No-show at/after ten minutes | Terminal; barber released | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T20 | Re-add no-show | New token at end | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T21 | Barber on break | No assignment; preference warning | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T22 | Break/off-duty while occupied | Rejected | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T23 | 90 min ahead, 3 working barbers, no active workload | Approx. 30 min | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T24 | No working barbers | Wait unavailable, not zero | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T25 | Earlier customer finishes | Estimate/position recompute | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T26 | At 20:30 with 21:00 closing | Online join blocked | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T27 | Walk-in during online cutoff | Accepted during open hours if on-duty barber exists | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T28 | Owner manually closes online queue | Home/Join and backend block online join | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T29 | Service disabled during selection | Rejected or asked to revise; old booking unchanged | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T30 | Customer becomes second then Called | Arrival banner then turn alert | [x] PASS — Local React/jsdom; [scenario evidence](acceptance-evidence.md) |
+| T31 | Start/Done in barber view | Reception, TV and customer update within target | [ ] NOT RUN — Partial only: prior hosted private status timing; local cross-view logic; [scenario evidence](acceptance-evidence.md) |
+| T32 | Two devices with deployed app | Shared persistent state, no manual refresh | [ ] NOT RUN — Partial only: prior five independent HTTP/WebSocket clients; [scenario evidence](acceptance-evidence.md) |
+| T33 | Disconnect/reconnect | Stale warning then resync | [ ] NOT RUN — Partial only: simulated online/offline/readiness in local tests; [scenario evidence](acceptance-evidence.md) |
+| T34 | Anonymous/incorrect-role staff request | Backend denies restricted data/actions | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T35 | Wrong barber attempts Start/Done | Denied | [x] PASS — Prior hosted React + current local regressions; [scenario evidence](acceptance-evidence.md) |
+| T36 | Inspect TV/public requests | No phone, customer name or private credential exposed | [x] PASS — Local public payload/DOM + previous hosted/public checks; [scenario evidence](acceptance-evidence.md) |
+| T37 | Invalid tracking link | Generic error; no customer details | [x] PASS — Local React/jsdom + PostgreSQL + prior hosted denial; [scenario evidence](acceptance-evidence.md) |
+| T38 | Toggle Gujarati on every route | All labels/messages translate without clipping | [ ] NOT RUN — Rendered coverage incomplete; [scenario evidence](acceptance-evidence.md) |
+| T39 | Phone/tablet/TV layouts | Readable, no overflow, usable controls | [ ] NOT RUN — Rendered coverage incomplete; [scenario evidence](acceptance-evidence.md) |
+| T40 | Owner stats with known sample data | Correct counts and mean wait | [x] PASS — Local PostgreSQL + component + prior hosted owner snapshot; [scenario evidence](acceptance-evidence.md) |
+| T41 | Production build and direct nested route refresh | Build succeeds; deployed route opens | [x] PASS — Local production build + prior/current production HTTP; [scenario evidence](acceptance-evidence.md) |
+| T42 | Attempt remote and walk-in admission at 09:59:59 for 10:00 opening | Both rejected using server time; no entry created | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T43 | Admit at exactly 10:00:00 with all other conditions valid | Both sources permitted; server timestamps and order recorded | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T44 | Remote admission at 20:29:59 versus 20:30:00 for 21:00 closing | Serialized server decision permits first and rejects second; delayed response does not change admission time | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T45 | Remote and walk-in admission at exactly 21:00:00 | Both rejected; existing active entries remain valid | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T46 | Walk-in at 20:59:59 while manual online switch is off | Accepted if server admission decision precedes closing and other conditions hold | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T47 | Authorized No-show request at 599 seconds Called | Rejected, remains Called and barber occupied | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T48 | Authorized No-show request at exactly 600 seconds Called | Accepted once if still Called; barber released | [x] PASS — Local PostgreSQL + React; [scenario evidence](acceptance-evidence.md) |
+| T49 | Customer or wrong-role staff requests No-show after 600 seconds | Denied regardless of elapsed time | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T50 | Staff access token expires but refresh succeeds | Valid session continues without exposing data or repeating mutations | [x] PASS — Hosted real SDK refresh + controlled React auth events; [scenario evidence](acceptance-evidence.md) |
+| T51 | Session refresh fails or staff session is revoked | Protected cache cleared, mutations blocked, same route presents sign-in | [x] PASS — Hosted revocation reproduction/retest + local SQL/React; [scenario evidence](acceptance-evidence.md) |
+| T52 | Sign out with another staff tab open | Protected data disappears in both tabs; stale requests cannot mutate | [ ] NOT RUN — Partial only: local session-loss handling + hosted revoked JWT denial; [scenario evidence](acceptance-evidence.md) |
+| T53 | Attempt public staff signup or self-update role/barber linkage | No public provisioning; privilege escalation denied by backend | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T54 | Anonymous request reads private tables or arbitrary queue fields | RLS/grants deny raw access; only explicit safe projections are available | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T55 | Public client reads/subscribes or writes the realtime signal | Signal contains only version/time; unauthorized writes denied; no PII event | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T56 | Admission commits but response is lost, then identical retry | Original token/locator returned with matching capability; one entry only | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T57 | Reuse admission key with different phone, selection, preference, source or capability | Payload-binding conflict; no second entry and no private result leaked | [x] PASS — Disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T58 | Two simultaneous identical admissions with one key | One receipt, one entry, one token; both matching requests reconcile to it | [x] PASS — Local PostgreSQL, independent connections; [scenario evidence](acceptance-evidence.md) |
+| T59 | Retry a successful admission after cutoff or a catalog edit | Original receipt returned; no new admission or reinterpretation of payload | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T60 | Refresh after an uncertain admission with saved opaque pending credentials | Protected receipt resolves committed entry; no phone/name cache or duplicate | [x] PASS — Local React/jsdom + SQL receipt + retained hosted lost-response proof; [scenario evidence](acceptance-evidence.md) |
+| T61 | Owner changes selected service price before admission commit | Stale request rejected without entry; new total needs explicit reconfirmation | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T62 | Owner changes selected service duration before admission commit | Stale request rejected; reviewed new duration requires a new bound request | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T63 | All on-duty barbers are on break during otherwise valid admission | Remote/walk-in allowed; wait unavailable and break warnings shown | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T64 | Choose a named on-duty barber on break, then try Call Next | Join allowed with warning; no assignment until that barber returns Available | [x] PASS — Local React/jsdom + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T65 | No barber is on duty, even with empty queue and online switch on | Both admission sources blocked; estimate unavailable, never zero | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T66 | Ongoing service reaches or exceeds booked duration without Done | Relevant wait becomes uncertain/overrun; no rolling five-minute promise | [x] PASS — Local PostgreSQL + React; [scenario evidence](acceptance-evidence.md) |
+| T67 | Waiting queue is empty but every eligible barber is occupied | Estimate includes current work or uncertainty; does not falsely show zero | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T68 | Named barber has earlier Any and named entries while other barbers work | Filtered position and single-barber estimate follow documented rules | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T69 | Cancellation and Call Next race on one Waiting entry | Exactly one valid transition wins; losing client reconciles current state | [x] PASS — Independent PostgreSQL connections + local React race reconciliation; [scenario evidence](acceptance-evidence.md) |
+| T70 | Start and eligible No-show race on one Called entry | Exactly one succeeds; no simultaneous In Chair and No-show or lost capacity | [x] PASS — Independent PostgreSQL connections; [scenario evidence](acceptance-evidence.md) |
+| T71 | Retry successful Call Next after its customer has completed | Original result returned; retry never calls a second customer | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T72 | Edit/disable a booked service after admission and refresh all views | Historical EN/GU names, price and duration unchanged; new joins use new catalog | [ ] NOT RUN — Partial only: SQL snapshots and catalog regression; [scenario evidence](acceptance-evidence.md) |
+| T73 | Same mobile entered with spaces, hyphens, +91 or ten-digit form | All normalize identically and share active-phone uniqueness | [x] PASS — Local client validation + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T74 | Submit another country code, letters, leading zero or malformed length | Rejected consistently by client/backend with translated errors | [x] PASS — Local client validation + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T75 | Active entry crosses closing and midnight, then same phone joins again | Existing entry/link/order survive; duplicate active admission rejected | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T76 | New admission after midnight on the next open day | Token sequence continues without reset; unresolved earlier eligible entries retain priority | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T77 | Customer joins yesterday and completes today; compare IST/browser dates | Counts and mean use today's IST completion date and actual join-to-call interval | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T78 | Terminal link used just before and exactly 24 hours after terminal_at | Before expiry permitted; at expiry denied generically; records/stats retained | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T79 | Active link is older than 24 hours or crosses multiple midnights | Remains valid while active; no age-based interruption | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T80 | Supply locator/token/phone without the matching private capability | No private response or cancellation; generic denial and bounded attempts | [x] PASS — Local PostgreSQL + Edge handler; [scenario evidence](acceptance-evidence.md) |
+| T81 | Inspect hosting/API logs, referrers, errors, storage and browser requests | Capability absent from path/query/logs/referrers; only opaque resume data stored; private responses no-store | [ ] NOT RUN — Partial only: code/transport tests and prior production headers; [scenario evidence](acceptance-evidence.md) |
+| T82 | Attempt direct edits of status, totals, snapshots, tokens or timestamps | Restricted grants/RPC checks deny bypasses; no client-authoritative values | [x] PASS — Disposable local PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T83 | Keyboard-only forms/dialogs and 320px Gujarati layouts | Labels, focus, 44px targets, contrast and wrapping remain usable | [ ] NOT RUN — Rendered coverage incomplete; [scenario evidence](acceptance-evidence.md) |
+| T84 | TV receives duplicate Called events, reconnects or audio permission is denied | Visual remains complete; one new-call chime at most; no historical replay | [x] PASS — Local React/jsdom with controlled Web Audio and connection errors; [scenario evidence](acceptance-evidence.md) |
+| T85 | Admission races with hours/switch/catalog/duty changes | Transaction serialization/recheck yields one consistent eligible outcome | [x] PASS — Disposable PostgreSQL, two independent connections; [scenario evidence](acceptance-evidence.md) |
+| T86 | Owner takes barber Off Duty with specific Waiting entries or active assignment | Rejected; preferences and current assignment preserved | [x] PASS — Local PostgreSQL + boundary/component tests + retained hosted evidence; [scenario evidence](acceptance-evidence.md) |
+| T87 | Two owners save different versions of the same settings/service | Stale save rejected with review guidance; no silent lost update | [x] PASS — Disposable PostgreSQL + React stale-save guidance; [scenario evidence](acceptance-evidence.md) |
+| T88 | Waiting duration is exactly 60 minutes, then exceeds 60 minutes | No long-wait highlight at equality; highlight/text appear only above threshold | [x] PASS — Local React/domain timer tests; [scenario evidence](acceptance-evidence.md) |
+| T89 | Browser clock is advanced to unlock cutoff or No-show | Server checks remain authoritative; spoofed timers cannot authorize changes | [x] PASS — Local React clock spoof + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T90 | Catalog form has missing GU name, fractional/zero duration or invalid price | Shared exact bounds enforced by backend; valid zero price remains permitted | [x] PASS — Local Owner form + disposable PostgreSQL; [scenario evidence](acceptance-evidence.md) |
+| T91 | Public join/status attempts exceed configured rate limits | Server returns bounded generic rate-limit response; no extra entries or data leakage | [ ] NOT RUN — Partial only: SQL counters + isolated Edge-handler 429 branches; [scenario evidence](acceptance-evidence.md) |
 
-The scenario wording for T01–T91 is preserved. The 34 explicitly evidenced results above (T01, T02, T03, T04, T05, T06, T09, T10, T11, T14, T15, T16, T17, T18, T22, T24, T28, T34, T35, T36, T40, T41, T48, T53, T54, T55, T56, T57, T71, T72, T84, T86, T87, T88) are marked passed; their environment is hosted React/jsdom, production build, and isolated PostgreSQL, not a real-browser visual review. All other 57 unchecked rows mean NOT RUN as complete scenarios, even when isolated checks cover a rule. See `final-verification.md` for exact scope, manual test scripts, and remaining browser/cross-device verification.
+The wording for T01–T91 is preserved. Final audit: **81 PASS, 0 FAIL, 10 NOT RUN**. Environments, individual assertions, previous hosted evidence and precise remaining gaps are listed in [acceptance-evidence.md](acceptance-evidence.md). Complete rendered-device scenarios are not inferred from unit tests. T72 was conservatively changed from its earlier PASS to NOT RUN because every-view refresh was not established. See [final-verification.md](final-verification.md) for the reproduced and corrected session-revocation defect, current commands and publication status.
 
 ## 9. References and decisions
 College Salon Queue Management Vibe Coding Guide, pp. 4–6 (flows, rules, tests), pp. 8–9 (deployment and submission). Technical safeguards, position definitions, time-zone defaults, token sequence policy, and detailed estimator behavior above are explicit project decisions. Phase 1 adds previews, Phase 2 the backend, Phase 2.5 hosted activation, Phase 3 the three customer screens and Phase 4 the staff login, reception and barber views. Owner settings and TV are implemented. Rendered browser/cross-device review and remaining unchecked numbered scenarios are pending.

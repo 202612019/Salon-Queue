@@ -1,5 +1,7 @@
 # Phase 4 verification — 24 November 2026
 
+> Historical phase report. Current acceptance totals, session-revocation correction and coverage limitations are in [final-verification.md](final-verification.md). Earlier phase counts and scope below are retained as historical evidence.
+
 Phase 4 connects Staff Login, Reception and the linked Barber workspace. Customer screens remain functional. Owner redirects to protected `/admin` with an explicit Phase 5 pending notice and disabled fictional settings; Waiting Area TV remains the existing public fictional preview. No full Owner/TV implementation, new staff accounts, frontend deployment or Git push is included.
 
 The actual pasted instruction ends with “Include” in its Walk-in section. The four canonical planning files supply the approved fields, queue rules, security and retry contract; no additional requirements were invented from missing text.

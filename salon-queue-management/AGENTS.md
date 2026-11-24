@@ -34,3 +34,6 @@ Retain the Phase 4 safeguards: discard protected caches on session changes; chec
 
 ## Definition of done
 Requested acceptance criteria satisfied, relevant build/lint/tests executed, no broken controls or regressions observed, implementation and documentation agree. Final submission includes public repository, working live URL, prompt log, three-minute demo and half-page reflection about a real AI mistake. No application code is authorized by this file alone.
+
+## Final acceptance audit continuation
+The latest user authorizes final QA, individual scenario evidence, critical defect corrections and commit/push. The session-revocation flaw was reproduced and corrected in additive migration 20261124000500 and the existing Edge walk-in boundary; keep those current-session checks on profile/RPC/retry access. Marker-checked isolated databases alone may use test Auth/clocks/truncation. Follow docs/acceptance-evidence.md and docs/visual-audit.md for actual coverage. Do not restore outdated PASS claims, override closing hours to make tests pass, modify existing customers, include the user's vercel.json whitespace change, or bypass a failed automatic approval review.

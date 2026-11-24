@@ -1,6 +1,6 @@
 # SalonQ — Screens & Features
 
-**Stage:** Phases 4–6 are implemented and the Vercel production application is connected to the existing Supabase project. The 24 November independent verification reran 122 frontend tests, 67 isolated SQL assertions, 37 database/concurrency checks, 19 production-backed React/jsdom checkpoints, and a five-customer HTTP/WebSocket queue audit. Rendered viewport, clipping, physical-device and audible sound checks remain NOT RUN. See `final-verification.md`; the functional requirements below are unchanged.
+**Stage:** Final acceptance audit: 81 PASS, 0 FAIL, 10 NOT RUN, individually evidenced in `docs/acceptance-evidence.md` (or `acceptance-evidence.md` from this docs directory). Current local checks: 140 frontend tests, 167 isolated SQL assertions including acceptance extensions, 45 database/concurrency checks. Hosted refresh/revocation and production HTTP/CORS retested; full rendered matrix and a fresh hosted React rerun remain incomplete. See `final-verification.md` and `visual-audit.md`. Functional requirements below are unchanged.
 
 ## Phase 1 desktop design approval and deferred refinements
 

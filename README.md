@@ -172,11 +172,11 @@ supabase db push
 
 ## 9. Verification & Testing Evidence
 
-Latest executed checks are listed below. See [final verification](salon-queue-management/docs/final-verification.md) for evidence and limitations. The 91 numbered scenarios remain 34 PASS / 57 NOT RUN; this is not a claim that all scenarios passed.
+Latest executed checks are listed below. See [final verification](salon-queue-management/docs/final-verification.md) for evidence and limitations. The 91 numbered scenarios now record **81 PASS / 0 FAIL / 10 NOT RUN**, with individual environments and remaining gaps in the acceptance evidence ledger. This is not a claim of 100% verification.
 
-Additional fresh checks: **37 database/concurrency checks PASS**, **19 hosted React/jsdom checkpoints PASS**, **five concurrent customer admissions/status clients PASS**. Rendered viewport/screenshots and physical-device checks: **NOT RUN**.
-- **`npm test`**: **122 / 122 PASS** (Unit and integration tests across 9 test suites, rerun during the final independent review).
-- **`npm run test:sql`**: **67 / 67 PASS** (Real PostgreSQL assertions verifying RLS, transactions, and edge cases).
+Additional current evidence: **45 database/concurrency checks PASS**, real hosted SDK refresh and session-revocation retest PASS, production HTTP/CORS PASS. Previous 19 hosted React checkpoints and five-client timings remain historical evidence. Rendered QA is partial; the full viewport/device matrix and fresh full hosted rerun remain unverified. See the final report for the automatic approval-review blocker and publication status.
+- **`npm test`**: **140 / 140 PASS** (9 test files; final acceptance run with two workers and a 15-second per-test budget).
+- **`npm run test:sql`**: **167 assertions PASS** with `npm run test:sql -- --acceptance` (74 baseline plus 93 acceptance-extension assertions in disposable PostgreSQL).
 - **`phase5-hosted.test.tsx`**: **10 / 10 PASS** (Previously recorded hosted TV/Owner checkpoints; historical evidence, not rerun during this review).
 - **`phase4-hosted.test.tsx`**: **17 / 17 PASS** (Previously recorded hosted staff checkpoints; historical evidence, not rerun during this review).
 - **`npm run lint`**: **PASS** (0 errors, 0 warnings).
