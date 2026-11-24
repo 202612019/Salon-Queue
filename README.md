@@ -158,21 +158,21 @@ The application opens at `http://127.0.0.1:5173/` (or `http://127.0.0.1:5174/`).
 ## 8. Database Migration Instructions
 
 Database migrations are located in `supabase/migrations/`:
-- `20261124000100_core_schema.sql`: Core tables, enums, indexes, and RLS policies.
-- `20261124000200_transactional_operations.sql`: Serialized queue operations (`admit`, `call_next`, `start`, `done`, `cancel`, `no_show`).
-- `20261124000300_realtime_signal.sql`: Sanitized change signal table (`salonq_changes`).
+- `20261124000100_salonq_schema.sql`: Private tables, constraints, RLS and sanitized change signal.
+- `20261124000200_salonq_operations.sql`: Serialized queue operations (`admit`, `call_next`, `start`, `done`, `cancel`, `no_show`).
+- `20261124000300_public_barber_estimates.sql`: Public barber estimates from the authoritative estimator.
 - `20261124000400_staff_retry_authorization.sql`: Private schema security facade and retry authorization check.
+- `20261124000500_staff_session_revocation.sql`: Current Auth session checks for protected staff access.
 
-Apply migrations using the Supabase CLI:
-```bash
-supabase db push
-```
+The existing hosted project is already configured. Evaluators do not need to apply migrations or seed data. For an authorized fresh setup, follow the [backend guide](salon-queue-management/supabase/README.md), apply all five files in order and explicitly select the intended project. Never apply test Auth/clock fixtures to hosted Supabase.
 
 ---
 
 ## 9. Verification & Testing Evidence
 
 Latest executed checks are listed below. See [final verification](salon-queue-management/docs/final-verification.md) for evidence and limitations. The 91 numbered scenarios now record **81 PASS / 0 FAIL / 10 NOT RUN**, with individual environments and remaining gaps in the acceptance evidence ledger. This is not a claim of 100% verification.
+
+Approved production audit: **03997cd**. **17 hosted security safeguards passed.** Development is closed; this submission update corrects documentation only.
 
 Additional current evidence: **45 database/concurrency checks PASS**, real hosted SDK refresh and session-revocation retest PASS, production HTTP/CORS PASS. A fresh hosted run passed **22 checkpoints** with zero customer/configuration writes, including the Add Walk-in dialog and all five demo staff roles. The published build matched six deployed Vercel assets byte-for-byte. Previous five-client timings remain historical evidence. Rendered QA is partial; the full viewport/device matrix remains unverified. The temporary approval-review failure was resolved; see the final report for publication and exact scope.
 - **`npm test`**: **140 / 140 PASS** (9 test files; final acceptance run with two workers and a 15-second per-test budget).
@@ -196,16 +196,16 @@ Pre-provisioned accounts for academic evaluation:
 - **Barber Amit**: `amit-demo@salonq.example` (Authorized for `/barber/amit`)
 - **Barber Imran**: `imran-demo@salonq.example` (Authorized for `/barber/imran`)
 
-> *Security Notice:* Staff passwords are protected in the local DPAPI credential store (`.artifacts/demo-accounts.dpapi.json`) and are never published to public Git repositories. Credentials have been provided to the evaluation committee via the college's secure submission channel.
+> *Evaluator access:* Supply the existing demonstration passwords privately through the college's secure submission channel. Delivery has not been independently verified. Passwords are protected locally and must not be published in Git, screenshots or the demo video.
 
 ---
 
 ## 11. AI Coding Methodology & Attributions
 
-This project was developed as a Vibe Coding assignment leveraging cutting-edge agentic AI:
+This Vibe Coding assignment used both tools, with the actual prompts and failed attempts retained:
 - **Initial Planning & Customer Screens**: Developed with OpenAI Codex.
-- **TV Display, Owner Settings, Security Hardening & Release**: Completed with **Google Antigravity**.
-- **Continuous Verification**: Every architectural decision, SQL migration, and component addition was rigorously validated with automated test suites before committing.
+- **TV Display, Owner Settings & Initial Release**: Developed with **Google Antigravity**.
+- **Final Security, Acceptance Audit & Closure**: Completed with **OpenAI Codex**; exact test environments and the 10 outstanding scenarios are documented.
 
 ---
 
@@ -214,7 +214,9 @@ This project was developed as a Vibe Coding assignment leveraging cutting-edge a
 - [Brief & Requirements](salon-queue-management/docs/01-brief.md)
 - [Screen Specifications](salon-queue-management/docs/02-screens.md)
 - [Flows & Queue Rules](salon-queue-management/docs/03-flows-rules.md)
-- [Final Phase 6 Verification Report](salon-queue-management/docs/final-verification.md)
+- [Final Verification Report](salon-queue-management/docs/final-verification.md)
+- [Acceptance Evidence Ledger](salon-queue-management/docs/acceptance-evidence.md)
+- [Visual Audit & Manual Checklist](salon-queue-management/docs/visual-audit.md)
 - [Three-Minute Presentation Script](salon-queue-management/docs/demo-script.md)
 - [Engineering Reflection Draft](salon-queue-management/docs/reflection-draft.md)
 - [Development Prompts History](salon-queue-management/prompts.md)

@@ -82,6 +82,8 @@ The application opens at `http://127.0.0.1:5173/` (or `http://127.0.0.1:5174/`).
 
 Latest executed checks are listed below. See [final verification](docs/final-verification.md) for evidence and limitations. The 91 numbered scenarios now record **81 PASS / 0 FAIL / 10 NOT RUN**, with individual environments and remaining gaps in the acceptance evidence ledger. This is not a claim of 100% verification.
 
+Approved production audit: **03997cd**. **17 hosted security safeguards passed.** Development is closed; this submission update corrects documentation only.
+
 Additional current evidence: **45 database/concurrency checks PASS**, real hosted SDK refresh and session-revocation retest PASS, production HTTP/CORS PASS. A fresh hosted run passed **22 checkpoints** with zero customer/configuration writes, including the Add Walk-in dialog and all five demo staff roles. The published build matched six deployed Vercel assets byte-for-byte. Previous five-client timings remain historical evidence. Rendered QA is partial; the full viewport/device matrix remains unverified. The temporary approval-review failure was resolved; see the final report for publication and exact scope.
 - **`npm test`**: **140 / 140 PASS** (9 test files; final acceptance run with two workers and a 15-second per-test budget).
 - **`npm run test:sql`**: **167 assertions PASS** with `npm run test:sql -- --acceptance` (74 baseline plus 93 acceptance-extension assertions in disposable PostgreSQL).
@@ -102,3 +104,5 @@ Additional current evidence: **45 database/concurrency checks PASS**, real hoste
 - **Barber Ravi**: `ravi-demo@salonq.example` (Authorized for `/barber/ravi`)
 - **Barber Amit**: `amit-demo@salonq.example` (Authorized for `/barber/amit`)
 - **Barber Imran**: `imran-demo@salonq.example` (Authorized for `/barber/imran`)
+
+Supply passwords privately to the evaluator; do not publish or record them. Password delivery and the required three-minute recorded video are student tasks, not verified deliverables. Review the [demo script](docs/demo-script.md), [reflection draft](docs/reflection-draft.md), [visual checklist](docs/visual-audit.md), [acceptance evidence](docs/acceptance-evidence.md) and [prompt history](prompts.md) before submitting.

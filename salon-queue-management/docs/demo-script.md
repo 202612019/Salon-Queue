@@ -1,62 +1,54 @@
 # SalonQ — Three-Minute Demonstration Script
 
-**Project:** SalonQ — Smart Salon Queue Management  
-**Target Duration:** Exactly 3 minutes (180 seconds)  
-**Audience:** College Assignment Evaluator / Professor  
+**Approved production audit:** 03997cd, 24 November 2026. **Target:** 3 minutes; rehearse and trim pauses to fit 180 seconds. This script is preparation, not evidence that a video has been recorded.
 
----
+**Live application:** [SalonQ](https://salon-queue-snowy.vercel.app/)
 
-### Introduction & Problem Statement (0:00 – 0:30)
+**Repository:** [202612019/Salon-Queue](https://github.com/202612019/Salon-Queue)
 
-> *"Good afternoon, Professor. Today I am presenting **SalonQ — Smart Salon Queue Management**, with our guiding motto: 'Your Time. Your Turn.'*
->
-> *Traditional salons suffer from crowded waiting areas, uncertain wait times, and customer anxiety. Customers often leave or don't return simply because they cannot see where they stand in line.*
->
-> *SalonQ solves this by providing a unified, real-time queue management system with seven thoughtfully designed screens. It gives customers the freedom to join remotely or walk in, track their progress privately on their own mobile devices, and see their turns called on a beautiful waiting area display, while giving salon staff and owners complete operational control."*
+## Before recording — not spoken
 
----
+- Prepare customer, Reception, linked Barber, TV and Owner tabs in separate browser profiles so staff logins do not replace one another. Sign in before recording; keep passwords, authorization headers and private tracking capabilities out of the video.
+- Use only your own fictional customer. Rehearse during permitted salon hours; do not bypass closing rules or modify an unrelated existing entry. If admissions are closed, explain the disabled controls and use a permitted prerecorded segment or an explicitly labelled preview. Never present a fictional preview as a successful live admission.
+- Select a barber whose eligible queue you can safely demonstrate. Enable TV sound by user gesture; sound/fullscreen permission may be denied. Use the actual issued token and current catalog totals, not a promised token or fabricated statistics.
+- The spoken sections below allow time for screen changes. Preserve the final verification limitations when trimming.
 
-### Customer Admission & Private Queue Tracking (0:30 – 1:05)
+## 0:00–0:20 — Home and purpose
 
-> *"Let's start from the customer perspective. On the Home screen (`/`), a customer sees live salon availability, current opening hours in IST, and an estimated wait time.*
->
-> *Clicking 'Join queue' (`/join`), the customer enters their name, 10-digit Indian mobile number, and selects up to three services — for example, a Haircut and Beard sculpt. They can choose a preferred barber or select 'Any barber' for the earliest available chair.*
->
-> *Upon confirmation, the backend generates a unique token — like S-042 — and an opaque 64-character private capability key. Notice that no customer account is required. The customer's status page (`/status/:id`) updates in real time, showing their exact queue position and an arrival notification when they reach position two."*
+“This is SalonQ — Smart Salon Queue Management: Your Time. Your Turn. It connects customers, reception, barbers, the waiting-area display and the owner through one persistent queue. Customers can spend less time waiting at the salon and follow their turn privately.”
 
----
+Show Home branding, current salon availability and authoritative queue information.
 
-### Reception Dashboard & Realtime Call Next (1:05 – 1:40)
+## 0:20–0:55 — Join and private Status
 
-> *"Now let's view the salon team's perspective. The receptionist signs in securely at `/login` and is directed to the Reception Dashboard (`/reception`).*
->
-> *Here, the receptionist sees live barber availability cards, active chair assignments, and the ordered queue. If a walk-in arrives at the door, the receptionist clicks 'Add walk-in' to admit them directly into the queue.*
->
-> *When barber Ravi is available, the receptionist clicks 'Call next'. The Supabase database transaction atomically reserves the earliest eligible customer matching Ravi's preference, assigns token S-042, and records the server timestamp.*
->
-> *Immediately, through PostgreSQL realtime change signals, the customer's phone switches to 'Called', showing 'Please proceed to Ravi'."*
+“On Join Queue, I enter fictional details, select one to three services and choose Any barber or a specific barber. The summary shows current prices and durations. Confirmation creates a unique token and opens my private queue pass. No customer account or SMS verification is required. This pass shows my position and approximate wait, with an arrival reminder at position two.”
 
----
+Demonstrate selection/totals and your own pass. Hide private link credentials.
 
-### Waiting Area TV & Barber Workspace (1:40 – 2:20)
+## 0:55–1:25 — Reception
 
-> *"Simultaneously, the Waiting Area TV display (`/display` or `/tv`) updates instantly. Ravi's station card turns to 'Called' with token S-042, the token pulses in champagne gold, and a 2-tone melodic chime plays for the room. Notice that for complete customer privacy, zero customer names or phone numbers ever appear on the public screen.*
->
-> *Now let's switch to Ravi's workspace (`/barber/ravi`). Ravi sees only his own assigned customer. When the customer sits in his chair, Ravi clicks 'Start service'. The elapsed timer starts counting from the server timestamp.*
->
-> *When the haircut is finished, Ravi clicks 'Mark as done', confirms the dialog, and his station immediately becomes available for the next customer."*
+“Reception sees the same ordered queue. Add Walk-in uses the same service and duplicate-phone rules, but remains available later than online admission, until salon closing. Call Next chooses the earliest eligible customer for this barber. It respects a named preference and reserves only one assignment. No-show is allowed only after ten server-measured minutes.”
 
----
+Show Add Walk-in without creating an unnecessary extra record; call only your own eligible fixture.
 
-### Owner Settings, Bilingual Support & Tech Stack (2:20 – 3:00)
+## 1:25–2:00 — TV and linked Barber
 
-> *"Finally, the salon owner logs in and accesses Owner Settings (`/admin`). The owner sees real-time daily metrics computed strictly for today in IST: customers served, average wait time from join to call, and no-shows.*
->
-> *The owner can toggle the online queue on or off with confirmation, adjust daily opening hours, manage the service catalog with rupee pricing and duration, and manage team duty and breaks.*
->
-> *Throughout every single screen, clicking the language toggle instantly translates all labels and validation messages into Gujarati with zero layout clipping.*
->
-> *Under the hood, SalonQ is built with React 19, TypeScript, Tailwind CSS, Vite with optimized code splitting, and Supabase PostgreSQL with strict Row-Level Security and private schema authorization facades.*
->
-> *Thank you for your time. SalonQ is fully operational and ready for your evaluation."*
+“The public TV shows tokens and barber states, with no customer names or phone numbers. A new call produces a visual alert and an optional chime. The assigned barber starts service, then confirms Done. The elapsed timer uses persisted server timestamps. Other authorized screens refetch automatically; waiting times remain estimates, not guaranteed countdowns.”
 
+Show Called, Start and confirmed Done only when your fixture is ready. Do not claim a measured latency from this recording unless you measure it.
+
+## 2:00–2:20 — Owner and Gujarati
+
+“The owner manages bilingual services, prices, durations, duty and online availability. Daily statistics use IST. I can switch the interface to Gujarati. Staff permissions are checked on the backend; changing a URL cannot grant another role.”
+
+Show Owner and a language toggle. Do not save configuration changes merely to demonstrate a dialog.
+
+## 2:20–3:00 — Verified results and honest limits
+
+“The approved audit passed 140 frontend tests, 167 SQL assertions, 45 database and concurrency checks, 22 hosted integration checkpoints and 17 hosted security safeguards. Of 91 acceptance scenarios, 81 passed, none failed and 10 remain not run. Full responsive, Gujarati clipping, accessibility and physical-device verification is incomplete. The evidence and limitations are documented in the repository. SalonQ is deployed on Vercel with Supabase, and ready for this college demonstration.”
+
+Leave the production URL and repository visible. Timing depends on speaking pace; rehearse the complete recording.
+
+## Verification reference — not spoken
+
+The remaining IDs are **T31, T32, T33, T38, T39, T52, T72, T81, T83 and T91**. See [final verification](final-verification.md), [individual acceptance evidence](acceptance-evidence.md) and [manual visual checks](visual-audit.md). Existing five-client timings are earlier audit evidence, not a guarantee for this video. A script or general manual approval does not complete these outstanding tests.

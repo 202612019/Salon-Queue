@@ -2,6 +2,8 @@
 
 **Latest review: 24 November 2026, IST.** Production: [SalonQ](https://salon-queue-snowy.vercel.app/). Repository: [202612019/Salon-Queue](https://github.com/202612019/Salon-Queue). Profile: [202612019](https://github.com/202612019).
 
+**Final closure:** the user approved the production audit in commit **03997cd**. The closure task reviewed submission documents and reconfirmed the public links only; it did not rerun development or change the application/backend. Approved totals remain 140 frontend tests, 167 SQL assertions, 45 database/concurrency checks, 22 hosted checkpoints and 17 security safeguards passed, with 81 acceptance PASS / 0 FAIL / 10 NOT RUN. The [three-minute script](demo-script.md) now states those results without claiming complete visual verification. The recorded video, student reflection approval and private evaluator password delivery remain manual submission tasks.
+
 ## Latest acceptance result
 
 **81 PASS / 0 FAIL / 10 NOT RUN**, individually mapped in [acceptance-evidence.md](acceptance-evidence.md). “0 FAIL” is the final status after correcting and retesting the reproduced session-revocation defect; the initial failure is documented below. A PASS includes its verification environment and may combine isolated PostgreSQL and React/jsdom evidence. It is not a claim that every case ran in a rendered production browser.

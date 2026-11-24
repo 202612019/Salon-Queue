@@ -2,6 +2,8 @@
 
 24 November 2026, IST. Production: [SalonQ](https://salon-queue-snowy.vercel.app/).
 
+The user approved audit **03997cd** for project closure. Its acceptance totals remain **81 PASS / 0 FAIL / 10 NOT RUN**. Closure approval does not convert the partial observations or the NOT RUN viewport matrix below into completed visual tests. Full approved test statistics are in [final-verification.md](final-verification.md).
+
 ## Observed in this audit
 
 The browser provider inventory returned **“Local browser access is unavailable for this chat.”** A permitted native Windows Chrome workflow subsequently worked using screenshots and coordinates; the previous input-geometry blocker was not assumed permanent. No alternative browser-control library, injected script, remote debugging connection or access-control bypass was used.
