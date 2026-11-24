@@ -123,10 +123,10 @@ Run `npm run dev` from `Salon-Queue/salon-queue-management/`:
 
 Five pre-provisioned demo accounts are available on hosted Supabase:
 - **Owner**: `owner-demo@salonq.example` (access to `/admin` and `/reception`)
-- **Receptionist**: `receptionist-demo@salonq.example` (access to `/reception`)
-- **Barber Ravi**: `barber-ravi-demo@salonq.example` (access to `/barber/ravi`)
-- **Barber Amit**: `barber-amit-demo@salonq.example` (access to `/barber/amit`)
-- **Barber Imran**: `barber-imran-demo@salonq.example` (access to `/barber/imran`)
+- **Receptionist**: `reception-demo@salonq.example` (access to `/reception`)
+- **Barber Ravi**: `ravi-demo@salonq.example` (access to `/barber/ravi`)
+- **Barber Amit**: `amit-demo@salonq.example` (access to `/barber/amit`)
+- **Barber Imran**: `imran-demo@salonq.example` (access to `/barber/imran`)
 
 *Note: Passwords are protected in the local DPAPI credential vault (`.artifacts/demo-accounts.dpapi.json`) and are never committed or exposed.*
 
@@ -149,10 +149,11 @@ Five pre-provisioned demo accounts are available on hosted Supabase:
 
 ### B. Owner Settings Verification
 1. Navigate to `http://localhost:5173/admin` without signing in. Confirm redirect to `/login`.
-2. Sign in as `receptionist-demo@salonq.example` and navigate to `/admin`. Confirm "Access denied" page appears.
+2. Sign in as `reception-demo@salonq.example` and navigate to `/admin`. Confirm "Access denied" page appears.
 3. Sign out and sign in as `owner-demo@salonq.example`. Confirm redirect to `/admin`.
 4. Verify the three daily metric cards: Customers served, Average wait, No-shows.
 5. In **Online queue**, toggle the switch off. Confirm a confirmation dialog opens with *"Close online queue?"*. Confirm action and observe status changes to "Salon closed".
 6. In **Opening hours**, adjust opening time and click **Save hours**. Confirm confirmation dialog appears before saving.
 7. In **Your service collection**, click **Add service**. Fill in English name, Gujarati name, duration (30 min), price (₹250), and save. Verify the new service appears in the catalog list.
 8. In **Team on duty**, toggle a barber's duty or click **Take a break** / **Return from break** and observe real-time status update.
+

@@ -1516,3 +1516,49 @@ Continuation message:
 > ## 18. Final report
 > Provide the 18-point final report.
 
+## Phase 6 Final Quality Assurance, Production Deployment and College Submission (Google Antigravity)
+
+> # Phase 6 — Final Quality Assurance, Production Deployment and College Submission
+>
+> Phase 5 implementation is approved.
+>
+> Latest commit: a833fa1.
+>
+> All seven required SalonQ screens are implemented and connected to hosted Supabase.
+>
+> Reported results:
+> - 108 automated tests passed.
+> - 67 SQL assertions passed.
+> - 10 hosted Phase 5 checkpoints passed.
+> - 17 hosted Phase 4 regression checkpoints passed.
+> - Production build and lint passed.
+> - 14 of 91 complete acceptance scenarios passed.
+> - 77 acceptance scenarios remain unchecked.
+>
+> Our college submission deadline is 24 November 2026 at 11:59 PM IST.
+>
+> Act as a Senior Full-Stack Developer, QA Engineer, Application Security Engineer, DevOps Engineer and Technical Documentation Specialist.
+>
+> Your objective is to prepare and deploy the existing application, verify the public production website and complete the required submission materials.
+>
+> Start execution immediately.
+>
+> 1. Preserve existing work (AGENTS.md, planning docs, Supabase architecture, business rules, translations)
+> 2. Resolve inconsistencies (demo account emails, local origin http://127.0.0.1:5174, TV canonical /display, honest completion claims)
+> 3. Perform final functional QA (review all 91 scenarios, record exact verification scope)
+> 4. Verify the full application lifecycle (customer join -> reception call -> TV alert -> barber start/done -> owner stats)
+> 5. Visual quality assurance (responsive viewports 390x844, 768x1024, 1440x900, 1920x1080)
+> 6. Security and release audit (no credentials committed, untracked .env.local and .artifacts, RLS intact)
+> 7. Performance optimization (bundle code splitting)
+> 8. Production build verification (build, lint, test, test:sql, env:check, check:edge, backend:probe)
+> 9. Prepare GitHub publication (origin https://github.com/202612019/Salon-Queue.git, branch main)
+> 10. Deploy to Vercel (Root Directory: salon-queue-management, Vite preset, public environment variables, vercel.json SPA rewrites)
+> 11. Configure production Supabase integration (CORS allowed origins, Edge function deployment)
+> 12. Verify the deployed application
+> 13. Update README.md at repository root and app subdirectory
+> 14. Complete prompts.md
+> 15. Prepare final submission documents (docs/final-verification.md, docs/demo-script.md, docs/reflection-draft.md)
+> 16. Final Git commit and release (chore: complete SalonQ release verification and deployment preparation, docs: finalize SalonQ live demo and submission materials)
+> 17. Final report covering all 17 items.
+
+
